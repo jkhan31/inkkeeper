@@ -1,23 +1,61 @@
-import { StyleSheet, View } from 'react-native';
-
-import PetDisplay from '@/components/PetDisplay';
-import { ThemedText } from '@/components/themed-text';
-import { ThemedView } from '@/components/themed-view';
+import React, { useState } from 'react';
+import { View, Text, TouchableOpacity, ScrollView } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import PetDisplay from '../../components/PetDisplay';
+import BookSearchModal from '../../components/BookSearchModal';
 
 export default function HomeScreen() {
+  const [isSearchVisible, setSearchVisible] = useState(false);
+
   return (
-    <ThemedView style={styles.container}>
-      <ThemedText type="title">Your Pet</ThemedText>
-      <PetDisplay />
-    </ThemedView>
+    <SafeAreaView className="flex-1 bg-stone-100">
+      <ScrollView contentContainerStyle={{ padding: 20 }}>
+        
+        {/* Header */}
+        <View className="flex-row justify-between items-center mb-8">
+          <Text className="text-2xl font-serif text-stone-800">Inkkeeper</Text>
+          <View className="bg-red-700 px-3 py-1 rounded-md">
+            <Text className="text-white font-bold">Rank 1</Text>
+          </View>
+        </View>
+
+        {/* The Pet Section */}
+        <View className="items-center mb-10">
+          <PetDisplay />
+          <Text className="mt-4 text-xl font-serif text-stone-800">Rusty the Kit</Text>
+          <View className="bg-stone-200 h-2 w-32 rounded-full mt-2 overflow-hidden">
+            <View className="bg-emerald-700 h-full w-[10%]" />
+          </View>
+          <Text className="text-stone-500 text-sm mt-1">20 / 250 Ink</Text>
+        </View>
+
+        {/* Library Actions */}
+        <View className="mb-6">
+          <Text className="text-stone-500 uppercase text-xs tracking-widest mb-3">Current Read</Text>
+          
+          {/* Placeholder for Active Book (We'll fix this later) */}
+          <View className="bg-white p-4 rounded-xl border border-stone-200 flex-row items-center justify-center h-24 border-dashed">
+            <Text className="text-stone-400">No active book</Text>
+          </View>
+        </View>
+
+        {/* Add Book Button */}
+        <TouchableOpacity 
+          onPress={() => setSearchVisible(true)}
+          className="bg-stone-800 flex-row items-center justify-center py-4 rounded-xl"
+        >
+          <MaterialCommunityIcons name="plus" size={24} color="white" />
+          <Text className="text-white font-serif ml-2">Log New Book</Text>
+        </TouchableOpacity>
+
+      </ScrollView>
+
+      {/* The Modal we just built */}
+      <BookSearchModal 
+        visible={isSearchVisible} 
+        onClose={() => setSearchVisible(false)} 
+      />
+    </SafeAreaView>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 16,
-  },
-});
