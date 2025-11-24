@@ -1,251 +1,177 @@
-// components/ui/AddBookForm.tsx
-import React, { useState, useEffect } from 'react';
-import { View, Text, TextInput, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, Platform } from 'react-native';
-import { ThemedText } from '../themed-text'; // Assuming these are in a 'components' folder
-import { ThemedView } from '../themed-view'; // Assuming these are in a 'components' folder
-import { supabase } from '../../lib/supabase'; // Adjust path if necessary
-import { MaterialCommunityIcons } from '@expo/vector-icons'; // For icons like 'book' or 'headphones'
-
-interface BookData {
-  title: string;
-  authors?: string[];
-  imageLinks?: {
-    thumbnail: string;
-  };
-  pageCount?: number;
-  // Add other properties from Google Books API as needed
-}
+import React, { useState } from 'react';
+import { View, Text, Image, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { supabase } from '../../lib/supabase';
 
 interface AddBookFormProps {
-  bookData: BookData;
+  bookData: any;
   onClose: () => void;
-  onBookAdded: () => void; // Callback to refresh list in parent
+  onSuccess: () => void;
 }
 
-export default function AddBookForm({ bookData, onClose, onBookAdded }: AddBookFormProps) {
-  const [totalPages, setTotalPages] = useState<string>(bookData.pageCount ? String(bookData.pageCount) : '');
-  const [format, setFormat] = useState<'Physical' | 'Audio'>('Physical');
-  const [loading, setLoading] = useState(false);
+export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFormProps) {
+  const info = bookData.volumeInfo || bookData;
+  
+  // State
+  const [format, setFormat] = useState<'physical' | 'audio'>('physical');
+  const [totalUnits, setTotalUnits] = useState(info.pageCount?.toString() || '300');
+  const [isSaving, setIsSaving] = useState(false);
 
-  // Derive cover image from bookData, ensuring https
-  const coverUrl = bookData.imageLinks?.thumbnail?.replace('http://', 'https://');
+  const handleSave = async () => {
+    if (!totalUnits || isNaN(Number(totalUnits))) {
+      Alert.alert('Invalid Input', 'Please enter a valid number of pages/minutes.');
+      return;
+    }
 
-  const handleSaveBook = async () => {
-    setLoading(true);
+    setIsSaving(true);
     try {
-      const { data, error } = await supabase
-        .from('books')
-        .insert([
-          {
-            title: bookData.title,
-            author: bookData.authors ? bookData.authors.join(', ') : 'Unknown Author',
-            cover_url: coverUrl,
-            total_pages: totalPages ? parseInt(totalPages, 10) : null,
-            format: format,
-            // Add any other relevant fields from bookData here
-          },
-        ])
-        .select(); // To get the inserted data back, if needed
+      // --- ROBUST DEV AUTH ---
+      // 1. Check if we already have a session
+      let { data: { user } } = await supabase.auth.getUser();
 
-      if (error) {
-        throw error;
+      // 2. If no session, try to Log In with the hardcoded test account
+      if (!user) {
+        console.log("No session. Attempting Dev Login...");
+        const email = 'tester@inkkeeper.app';
+        const password = 'password123'; // Simple dev password
+
+        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+          email,
+          password
+        });
+
+        // 3. If Login fails (user doesn't exist yet), Sign Up
+        if (signInError) {
+           console.log("Login failed, creating new Dev User...");
+           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+             email,
+             password
+           });
+           if (signUpError) throw signUpError;
+           user = signUpData.user;
+        } else {
+           user = signInData.user;
+        }
       }
+      
+      if (!user) throw new Error('Authentication failed');
+      // -----------------------
 
-      console.log('Book added successfully:', data);
-      Alert.alert('Success', `${bookData.title} added to your library!`);
-      onClose();
-      onBookAdded(); // Trigger refresh in parent component
+      // 4. Insert Book
+      const { data: newBook, error: bookError } = await supabase
+        .from('books')
+        .insert({
+          user_id: user.id,
+          title: info.title,
+          author: info.authors ? info.authors[0] : 'Unknown',
+          cover_url: info.imageLinks?.thumbnail,
+          total_units: Number(totalUnits),
+          format: format,
+          status: 'active',
+        })
+        .select()
+        .single();
+
+      if (bookError) throw bookError;
+
+      // 5. Update Profile
+      // Upsert ensures the profile exists for this new user
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .upsert({ 
+            id: user.id, 
+            active_book_id: newBook.id 
+        });
+
+      if (profileError) console.warn("Profile error:", profileError);
+
+      onSuccess();
+
     } catch (error: any) {
-      console.error('Error adding book:', error.message);
-      Alert.alert('Error', `Failed to add book: ${error.message}`);
+      console.error("SAVE ERROR:", error);
+      Alert.alert('Save Error', error.message);
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   };
 
   return (
-    <ThemedView style={styles.container}>
-      <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-        <MaterialCommunityIcons name="close-circle" size={28} color="gray" />
-      </TouchableOpacity>
+    <View className="flex-1">
+      {/* Header */}
+      <View className="items-center mb-6">
+        <View className="shadow-lg shadow-black/20 bg-white rounded-lg mb-4">
+           {info.imageLinks?.thumbnail ? (
+             <Image 
+               source={{ uri: info.imageLinks.thumbnail }} 
+               className="w-24 h-36 rounded-lg" 
+               resizeMode="cover"
+             />
+           ) : (
+             <View className="w-24 h-36 bg-stone-200 rounded-lg items-center justify-center">
+               <MaterialCommunityIcons name="book" size={40} color="#78716C" />
+             </View>
+           )}
+        </View>
+        <Text className="text-xl font-serif text-stone-800 text-center font-bold px-4">{info.title}</Text>
+        <Text className="text-stone-500 text-sm mt-1">{info.authors?.[0]}</Text>
+      </View>
 
-      <ThemedText type="title" style={styles.title}>Add Book Details</ThemedText>
+      {/* Format Selector */}
+      <View className="flex-row bg-stone-100 p-1 rounded-xl mb-6">
+        <TouchableOpacity 
+          onPress={() => setFormat('physical')}
+          className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${format === 'physical' ? 'bg-white shadow-sm' : ''}`}
+        >
+          <MaterialCommunityIcons name="book-open-page-variant" size={20} color={format === 'physical' ? '#EA580C' : '#78716C'} />
+          <Text className={`ml-2 font-bold ${format === 'physical' ? 'text-stone-800' : 'text-stone-500'}`}>Physical</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity 
+          onPress={() => setFormat('audio')}
+          className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${format === 'audio' ? 'bg-white shadow-sm' : ''}`}
+        >
+          <MaterialCommunityIcons name="headphones" size={20} color={format === 'audio' ? '#EA580C' : '#78716C'} />
+          <Text className={`ml-2 font-bold ${format === 'audio' ? 'text-stone-800' : 'text-stone-500'}`}>Audio</Text>
+        </TouchableOpacity>
+      </View>
 
-      <View style={styles.bookInfo}>
-        {coverUrl ? (
-          <Image source={{ uri: coverUrl }} style={styles.coverImage} resizeMode="contain" />
-        ) : (
-          <View style={styles.noCover}>
-            <MaterialCommunityIcons name="book-open-blank-variant" size={60} color="gray" />
-            <ThemedText style={{ color: 'gray' }}>No Cover</ThemedText>
-          </View>
-        )}
-        <View style={styles.textInfo}>
-          <ThemedText type="subtitle" style={styles.bookTitle}>{bookData.title}</ThemedText>
-          {bookData.authors && (
-            <ThemedText style={styles.bookAuthor}>{bookData.authors.join(', ')}</ThemedText>
+      {/* Inputs */}
+      <View className="mb-8">
+        <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest">
+          {format === 'physical' ? 'Total Pages' : 'Duration (Minutes)'}
+        </Text>
+        <View className="bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 flex-row items-center">
+          <TextInput
+            value={totalUnits}
+            onChangeText={setTotalUnits}
+            keyboardType="number-pad"
+            className="flex-1 text-lg font-bold text-stone-800"
+          />
+          <Text className="text-stone-400 text-sm">{format === 'physical' ? 'Pages' : 'Mins'}</Text>
+        </View>
+      </View>
+
+      {/* Footer Actions */}
+      <View className="mt-auto">
+        <TouchableOpacity 
+          onPress={handleSave}
+          disabled={isSaving}
+          className="bg-orange-600 py-4 rounded-xl flex-row items-center justify-center mb-3 shadow-sm shadow-orange-200"
+        >
+          {isSaving ? (
+             <ActivityIndicator color="white" />
+          ) : (
+             <>
+               <MaterialCommunityIcons name="check-circle" size={20} color="white" />
+               <Text className="text-white font-bold ml-2 text-lg">Start Reading</Text>
+             </>
           )}
-        </View>
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={onClose} disabled={isSaving} className="py-3 items-center">
+          <Text className="text-stone-400 font-bold">Cancel</Text>
+        </TouchableOpacity>
       </View>
-
-      <View style={styles.inputGroup}>
-        <ThemedText style={styles.label}>Total Pages:</ThemedText>
-        <TextInput
-          style={styles.input}
-          placeholder="e.g., 300"
-          keyboardType="numeric"
-          value={totalPages}
-          onChangeText={(text) => setTotalPages(text.replace(/[^0-9]/g, ''))} // Allow only numbers
-        />
-      </View>
-
-      <View style={styles.inputGroup}>
-        <ThemedText style={styles.label}>Format:</ThemedText>
-        <View style={styles.formatToggle}>
-          <TouchableOpacity
-            style={[styles.formatOption, format === 'Physical' && styles.selectedFormat]}
-            onPress={() => setFormat('Physical')}
-          >
-            <MaterialCommunityIcons name="book" size={20} color={format === 'Physical' ? 'white' : 'gray'} />
-            <Text style={[styles.formatText, format === 'Physical' && styles.selectedFormatText]}>Physical</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.formatOption, format === 'Audio' && styles.selectedFormat]}
-            onPress={() => setFormat('Audio')}
-          >
-            <MaterialCommunityIcons name="headphones" size={20} color={format === 'Audio' ? 'white' : 'gray'} />
-            <Text style={[styles.formatText, format === 'Audio' && styles.selectedFormatText]}>Audio</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={handleSaveBook}
-        disabled={loading}
-      >
-        {loading ? (
-          <ActivityIndicator color="#fff" />
-        ) : (
-          <Text style={styles.saveButtonText}>Add Book to Library</Text>
-        )}
-      </TouchableOpacity>
-    </ThemedView>
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    borderRadius: 10,
-    width: '95%',
-    alignSelf: 'center',
-    marginTop: 20,
-    // Add shadow if not using ThemedView for shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
-  },
-  closeButton: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1,
-  },
-  title: {
-    textAlign: 'center',
-    marginBottom: 20,
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  bookInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  coverImage: {
-    width: 80,
-    height: 120,
-    borderRadius: 5,
-    marginRight: 15,
-    backgroundColor: '#eee', // Placeholder background
-  },
-  noCover: {
-    width: 80,
-    height: 120,
-    borderRadius: 5,
-    marginRight: 15,
-    backgroundColor: '#eee',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  textInfo: {
-    flex: 1,
-  },
-  bookTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  bookAuthor: {
-    fontSize: 14,
-    color: 'gray',
-    marginTop: 5,
-  },
-  inputGroup: {
-    marginBottom: 15,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 5,
-    fontWeight: '500',
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: Platform.OS === 'ios' ? 12 : 10,
-    fontSize: 16,
-    color: '#333',
-    backgroundColor: '#fff',
-  },
-  formatToggle: {
-    flexDirection: 'row',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 8,
-    overflow: 'hidden',
-  },
-  formatOption: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 10,
-  },
-  selectedFormat: {
-    backgroundColor: '#007AFF', // A common blue for selection
-  },
-  formatText: {
-    fontSize: 16,
-    marginLeft: 5,
-    color: 'gray',
-  },
-  selectedFormatText: {
-    color: 'white',
-    fontWeight: 'bold',
-  },
-  saveButton: {
-    backgroundColor: '#28a745', // Green save button
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 20,
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-});

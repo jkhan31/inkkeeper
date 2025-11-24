@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { 
   Modal, View, Text, TextInput, TouchableOpacity, FlatList, Image, 
-  ActivityIndicator, KeyboardAvoidingView, Platform 
+  ActivityIndicator, KeyboardAvoidingView, Platform, Keyboard 
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import AddBookForm from './ui/AddBookForm'; // Import the new form
+
 
 interface BookSearchModalProps {
   visible: boolean;
@@ -20,14 +21,53 @@ export default function BookSearchModal({ visible, onClose }: BookSearchModalPro
   const [selectedBook, setSelectedBook] = useState<any>(null);
 
   const handleSearch = async () => {
+    Keyboard.dismiss();
     if (!query.trim()) return;
     setLoading(true);
+
     try {
       const response = await fetch(`https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}`);
       const data = await response.json();
+
+      if (data.error) {
+        console.warn("API Blocked (Using Mock Data):", data.error.message);
+        throw new Error("API Blocked");
+      }
+
       setResults(data.items || []);
+
     } catch (error) {
-      console.error(error);
+      // FALLBACK: If API fails, show these fake books so we can build the UI
+      console.log("⚠️ Switching to Mock Data for Dev");
+      setResults([
+        {
+          id: '1',
+          volumeInfo: {
+            title: 'Atomic Habits',
+            authors: ['James Clear'],
+            pageCount: 320,
+            imageLinks: { thumbnail: 'https://m.media-amazon.com/images/I/81wgcld4wxL.jpg' }
+          }
+        },
+        {
+          id: '2',
+          volumeInfo: {
+            title: 'The Hobbit',
+            authors: ['J.R.R. Tolkien'],
+            pageCount: 310,
+            imageLinks: { thumbnail: 'https://m.media-amazon.com/images/I/71jGJfemUxL.jpg' }
+          }
+        },
+        {
+          id: '3',
+          volumeInfo: {
+            title: 'Deep Work',
+            authors: ['Cal Newport'],
+            pageCount: 296,
+            imageLinks: { thumbnail: 'https://m.media-amazon.com/images/I/71ELYPh5g3L.jpg' }
+          }
+        }
+      ]);
     } finally {
       setLoading(false);
     }
@@ -65,13 +105,18 @@ export default function BookSearchModal({ visible, onClose }: BookSearchModalPro
         
         {/* If a book is selected, show the Add Form instead of the Search List */}
         {selectedBook ? (
-          <View className="bg-white h-[85%] rounded-t-3xl p-5 shadow-xl">
-             <AddBookForm 
-               bookData={selectedBook} 
-               onClose={() => setSelectedBook(null)} // Go back to search
-             />
-          </View>
-        ) : (
+            <View className="bg-white h-[85%] rounded-t-3xl p-5 shadow-xl">
+              <AddBookForm 
+                bookData={selectedBook} 
+                onClose={() => setSelectedBook(null)} 
+                onSuccess={() => {
+                  setSelectedBook(null);
+                  onClose();
+                  // We will add a global refresh trigger later
+                }}
+              />
+            </View>
+          ) : (
           /* OTHERWISE, show the Search List */
           <View className="bg-white h-[85%] rounded-t-3xl p-5 shadow-xl">
             {/* Header */}
@@ -101,6 +146,7 @@ export default function BookSearchModal({ visible, onClose }: BookSearchModalPro
             {/* List */}
             {loading ? <ActivityIndicator size="large" color="#EA580C" className="mt-10" /> : 
               <FlatList 
+                className="flex-1"
                 data={results} 
                 renderItem={renderItem} 
                 keyExtractor={(item) => item.id} 
