@@ -35,7 +35,6 @@ export default function HomeScreen() {
         {/* Library Actions */}
         <View className="mb-6">
           <Text className="text-stone-500 uppercase text-xs tracking-widest mb-3">Current Read</Text>
-          
           <TouchableOpacity 
             onPress={() => router.push('/log-session')}
             className="bg-white p-4 rounded-xl border border-stone-200 flex-row items-center h-24 shadow-sm"
