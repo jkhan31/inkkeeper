@@ -44,21 +44,38 @@ export default function HomeScreen() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      const { data: profile, error: profileError } = await supabase
+      // 1. Get Profile (Use maybeSingle to avoid crashing if new user)
+      let { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('ink_drops, active_book_id')
         .eq('id', user.id)
-        .single();
+        .maybeSingle(); // <--- CHANGED FROM .single()
       
       if (profileError) throw profileError;
-      setInkDrops(profile.ink_drops || 0);
 
-      if (profile.active_book_id) {
+      // 2. SELF-HEALING: If no profile exists, create one now
+      if (!profile) {
+        console.log("No profile found. Creating one...");
+        const { data: newProfile, error: createError } = await supabase
+          .from('profiles')
+          .insert({ id: user.id, email: user.email }) // Create the row
+          .select('ink_drops, active_book_id')
+          .single();
+        
+        if (createError) throw createError;
+        profile = newProfile;
+      }
+
+      setInkDrops(profile?.ink_drops || 0);
+
+      // 3. Get Book Details (if ID exists)
+      if (profile?.active_book_id) {
         const { data: book, error: bookError } = await supabase
           .from('books')
           .select('*')
           .eq('id', profile.active_book_id)
           .single();
+        
         if (bookError) console.error("Book Error", bookError);
         setActiveBook(book);
       } else {

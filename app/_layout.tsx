@@ -1,51 +1,52 @@
-import { Tabs } from 'expo-router';
-import React from 'react';
-import { Platform } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Stack, router, Segments, useRouter, useSegments } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { supabase } from '../lib/supabase';
+import { View, ActivityIndicator } from 'react-native';
 
-export default function TabLayout() {
+export default function RootLayout() {
+  const [session, setSession] = useState<any>(null);
+  const [initialized, setInitialized] = useState(false);
+  const segments = useSegments();
+  const router = useRouter();
+
+  useEffect(() => {
+    // 1. Check Initial Session
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      setInitialized(true);
+    });
+
+    // 2. Listen for Changes (Login/Logout)
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  // 3. Protect Routes
+  useEffect(() => {
+    if (!initialized) return;
+
+    const inAuthGroup = segments[0] === '(tabs)';
+    
+    if (session && !inAuthGroup) {
+      // If Logged In -> Go to Home
+      router.replace('/(tabs)/');
+    } else if (!session && inAuthGroup) {
+      // If Logged Out -> Go to Login
+      router.replace('/login');
+    }
+  }, [session, initialized, segments]);
+
+  if (!initialized) {
+    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator /></View>;
+  }
+
   return (
-    <Tabs
-      screenOptions={{
-        // 1. Theme Colors
-        tabBarActiveTintColor: '#EA580C', // Fox Rust (Orange)
-        tabBarInactiveTintColor: '#A8A29E', // Stone 400 (Grey)
-        
-        // 2. Remove the default top header (We made our own custom headers)
-        headerShown: false, 
-        
-        // 3. Style the bar itself
-        tabBarStyle: {
-          backgroundColor: '#FFFFFF',
-          borderTopColor: '#E7E5E4', // Stone 200
-          height: Platform.OS === 'ios' ? 85 : 65,
-          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
-          paddingTop: 8,
-        },
-        tabBarLabelStyle: {
-          fontFamily: Platform.OS === 'ios' ? 'System' : 'sans-serif-medium',
-          fontSize: 12,
-        },
-      }}>
-      
-      {/* Tab 1: Home */}
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Home',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="home-variant" size={28} color={color} />,
-        }}
-      />
-      
-      {/* Tab 2: Library */}
-      <Tabs.Screen
-        name="library"
-        options={{
-          title: 'Library',
-          tabBarLabel: 'Library',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="bookshelf" size={28} color={color} />,
-        }}
-      />
-    </Tabs>
+    <Stack screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="login" />
+      <Stack.Screen name="(tabs)" />
+    </Stack>
   );
 }
