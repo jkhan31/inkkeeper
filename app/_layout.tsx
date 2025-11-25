@@ -37,9 +37,9 @@ export default function TabLayout() {
         }}
       />
       
-      {/* Tab 2: Library (Mapped to 'explore.tsx') */}
+      {/* Tab 2: Library */}
       <Tabs.Screen
-        name="explore"
+        name="library"
         options={{
           title: 'Library',
           tabBarLabel: 'Library',
