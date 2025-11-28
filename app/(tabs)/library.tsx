@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useFocusEffect } from 'expo-router';
 import { supabase } from '../../lib/supabase';
+import CreateShelfModal from '../../components/CreateShelfModal'; // <--- IMPORT 1
 
 // Define the book type for type safety
 interface Book {
@@ -26,6 +27,10 @@ export default function LibraryScreen() {
   const [shelves, setShelves] = useState<Shelves>({});
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  
+  // --- NEW STATE FOR MODAL ---
+  const [isCreateShelfVisible, setCreateShelfVisible] = useState(false);
+  const [allBooksRaw, setAllBooksRaw] = useState<Book[]>([]); 
 
   // 1. Data Fetching & Processing
   const fetchLibrary = async () => {
@@ -39,6 +44,9 @@ export default function LibraryScreen() {
         .eq('user_id', user.id);
 
       if (error) throw error;
+
+      // --- SAVE RAW DATA FOR MODAL ---
+      setAllBooksRaw(allBooks); 
 
       // 2. Data Processing: Isolate active book and group the rest
       const active = allBooks.find(b => b.status === 'active') || null;
@@ -76,11 +84,13 @@ export default function LibraryScreen() {
     
   // 4. Interactions
   const handleBookPress = (book: Book) => {
-    console.log("Tapped on book:", book.title);
     // Placeholder for opening BookDetailsModal
-    Alert.alert("Book Details", `You tapped on "${book.title}".`);
+    // For now, we just log it. Later this will open the book details.
+    console.log("Tapped on book:", book.title);
   };
 
+  // Keep this logic for single-book moves if you want, 
+  // or rely entirely on the new Modal.
   const handleMoveToShelf = (book: Book) => {
     Alert.prompt(
       "Move to Shelf",
@@ -96,8 +106,7 @@ export default function LibraryScreen() {
             
           if (error) throw error;
           
-          Alert.alert("Success", `Moved "${book.title}" to "${newShelfName.trim()}".`);
-          fetchLibrary(); // Refresh the library to show the change
+          fetchLibrary(); // Refresh
 
         } catch (error: any) {
           Alert.alert("Error", error.message);
@@ -108,11 +117,9 @@ export default function LibraryScreen() {
     );
   };
     
+  // --- UPDATED HANDLER ---
   const handleAddNewShelf = () => {
-      Alert.alert(
-          "Create a Shelf", 
-          "To create a new shelf, simply long-press any book in your library and choose 'Move to Shelf'. Entering a new name will create it automatically."
-      );
+      setCreateShelfVisible(true);
   };
 
   // --- Render Components ---
@@ -129,7 +136,14 @@ export default function LibraryScreen() {
           className="bg-stone-50 rounded-xl p-4 shadow-sm border border-stone-200"
         >
           <View className="flex-row">
-            <Image source={{ uri: activeBook.cover_url }} className="w-24 h-36 rounded-lg shadow-md shadow-black/20" />
+            {activeBook.cover_url ? (
+                <Image source={{ uri: activeBook.cover_url }} className="w-24 h-36 rounded-lg shadow-md shadow-black/20" />
+            ) : (
+                <View className="w-24 h-36 bg-stone-300 rounded-lg items-center justify-center">
+                    <MaterialCommunityIcons name="book" size={40} color="white" />
+                </View>
+            )}
+            
             <View className="flex-1 ml-4 justify-between">
                 <View>
                     <Text className="text-lg font-bold text-stone-800" numberOfLines={2}>{activeBook.title}</Text>
@@ -167,11 +181,18 @@ export default function LibraryScreen() {
               onLongPress={() => handleMoveToShelf(item)}
               className="mr-3"
             >
-              <Image 
-                source={{ uri: item.cover_url }} 
-                className="w-28 h-40 rounded-md shadow-sm bg-stone-200"
-                resizeMode="cover"
-              />
+              {item.cover_url ? (
+                  <Image 
+                    source={{ uri: item.cover_url }} 
+                    className="w-28 h-40 rounded-md shadow-sm bg-stone-200"
+                    resizeMode="cover"
+                  />
+              ) : (
+                  <View className="w-28 h-40 rounded-md shadow-sm bg-stone-200 items-center justify-center">
+                     <MaterialCommunityIcons name="book-open-variant" size={32} color="#A8A29E" />
+                     <Text className="text-xs text-stone-500 text-center mt-2 px-1" numberOfLines={2}>{item.title}</Text>
+                  </View>
+              )}
             </TouchableOpacity>
           )}
         />
@@ -195,9 +216,12 @@ export default function LibraryScreen() {
                 <>
                     {renderActiveBook()}
                     {Object.entries(shelves).map(([name, books]) => renderShelf({ name, books }))}
-                    <View className="py-8 items-center">
-                        <TouchableOpacity onPress={handleAddNewShelf} className="border border-dashed border-stone-300 rounded-full px-4 py-2">
-                           <Text className="text-stone-500 font-bold text-xs">+ Add New Shelf</Text>
+                    
+                    {/* Add Shelf Button */}
+                    <View className="py-8 items-center pb-20">
+                        <TouchableOpacity onPress={handleAddNewShelf} className="border border-dashed border-stone-300 rounded-full px-4 py-2 flex-row items-center">
+                           <MaterialCommunityIcons name="plus" size={16} color="#78716C" />
+                           <Text className="text-stone-500 font-bold text-xs ml-1">Create New Shelf</Text>
                         </TouchableOpacity>
                     </View>
                 </>
@@ -208,6 +232,17 @@ export default function LibraryScreen() {
                 </View>
             )}
         </ScrollView>
+
+        {/* --- THE NEW MODAL --- */}
+        <CreateShelfModal 
+            visible={isCreateShelfVisible}
+            // Filter out the active book so users don't accidentally move it to a shelf
+            books={allBooksRaw.filter(b => b.status !== 'active')} 
+            onClose={() => setCreateShelfVisible(false)}
+            onSuccess={() => {
+                fetchLibrary(); // Refresh the list
+            }}
+        />
     </SafeAreaView>
   );
 }
