@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { View, Text, Image, TouchableOpacity, TextInput, ActivityIndicator, Alert } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, Image, TouchableOpacity, TextInput, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { supabase } from '../../lib/supabase';
 
@@ -12,12 +12,67 @@ interface AddBookFormProps {
 export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFormProps) {
   const info = bookData.volumeInfo || bookData;
   
-  // State
   const [format, setFormat] = useState<'physical' | 'audio'>('physical');
+  const [status, setStatus] = useState<'active' | 'wishlist'>('active'); 
   const [totalUnits, setTotalUnits] = useState(info.pageCount?.toString() || '300');
   const [isSaving, setIsSaving] = useState(false);
+  const [loadingChecks, setLoadingChecks] = useState(true);
+  const [isDuplicate, setIsDuplicate] = useState(false);
 
-  const handleSave = async () => {
+  useEffect(() => {
+    performPreChecks();
+  }, [info.title]);
+
+  const performPreChecks = async () => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('active_book_id')
+        .eq('id', user.id)
+        .single();
+
+      if (profile?.active_book_id) {
+        setStatus('wishlist');
+      } else {
+        setStatus('active');
+      }
+
+      const { data: duplicates } = await supabase
+        .from('books')
+        .select('id')
+        .eq('user_id', user.id)
+        .ilike('title', info.title); 
+
+      if (duplicates && duplicates.length > 0) {
+        setIsDuplicate(true);
+      }
+
+    } catch (error) {
+      console.error("Pre-check error:", error);
+    } finally {
+      setLoadingChecks(false);
+    }
+  };
+
+  const handleSave = () => {
+    if (isDuplicate) {
+      Alert.alert(
+        "Duplicate Found",
+        `You already have "${info.title}" in your library. Add it anyway?`,
+        [
+          { text: "Cancel", style: "cancel", onPress: () => setIsSaving(false) },
+          { text: "Add Anyway", style: "default", onPress: proceedWithSave }
+        ]
+      );
+    } else {
+      proceedWithSave();
+    }
+  };
+
+  const proceedWithSave = async () => {
     if (!totalUnits || isNaN(Number(totalUnits))) {
       Alert.alert('Invalid Input', 'Please enter a valid number of pages/minutes.');
       return;
@@ -25,39 +80,9 @@ export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFor
 
     setIsSaving(true);
     try {
-      // --- ROBUST DEV AUTH ---
-      // 1. Check if we already have a session
-      let { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('No user found');
 
-      // 2. If no session, try to Log In with the hardcoded test account
-      if (!user) {
-        console.log("No session. Attempting Dev Login...");
-        const email = 'tester@inkkeeper.app';
-        const password = 'password123'; // Simple dev password
-
-        const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password
-        });
-
-        // 3. If Login fails (user doesn't exist yet), Sign Up
-        if (signInError) {
-           console.log("Login failed, creating new Dev User...");
-           const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
-             email,
-             password
-           });
-           if (signUpError) throw signUpError;
-           user = signUpData.user;
-        } else {
-           user = signInData.user;
-        }
-      }
-      
-      if (!user) throw new Error('Authentication failed');
-      // -----------------------
-
-      // 4. Insert Book
       const { data: newBook, error: bookError } = await supabase
         .from('books')
         .insert({
@@ -67,37 +92,59 @@ export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFor
           cover_url: info.imageLinks?.thumbnail,
           total_units: Number(totalUnits),
           format: format,
-          status: 'active',
+          status: status, 
         })
         .select()
         .single();
 
       if (bookError) throw bookError;
 
-      // 5. Update Profile
-      // Upsert ensures the profile exists for this new user
-      const { error: profileError } = await supabase
-        .from('profiles')
-        .upsert({ 
-            id: user.id, 
-            active_book_id: newBook.id 
-        });
+      if (status === 'active') {
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .update({ active_book_id: newBook.id })
+          .eq('id', user.id);
 
-      if (profileError) console.warn("Profile error:", profileError);
+        if (profileError) console.error("Profile update failed:", profileError);
+      }
 
       onSuccess();
 
     } catch (error: any) {
-      console.error("SAVE ERROR:", error);
-      Alert.alert('Save Error', error.message);
+      Alert.alert('Error', error.message);
     } finally {
       setIsSaving(false);
     }
   };
 
+  if (loadingChecks) {
+    return (
+        <View className="flex-1 justify-center items-center h-64">
+            <ActivityIndicator color="#EA580C" />
+            <Text className="text-stone-400 text-xs mt-2">Checking Library...</Text>
+        </View>
+    );
+  }
+
   return (
-    <View className="flex-1">
-      {/* Header */}
+    <ScrollView 
+      className="flex-1 px-1" 
+      showsVerticalScrollIndicator={true} // <--- ENABLED SCROLLBAR
+      indicatorStyle="black"              // <--- DARK SCROLLBAR FOR iOS
+      contentContainerStyle={{ paddingBottom: 40 }} // <--- EXTRA PADDING AT BOTTOM
+    >
+      
+      <View className="flex-row justify-between items-center mb-2 mt-2">
+        <TouchableOpacity 
+            onPress={onClose} 
+            className="w-10 h-10 bg-stone-100 rounded-full items-center justify-center"
+        >
+            <MaterialCommunityIcons name="close" size={24} color="#57534E" />
+        </TouchableOpacity>
+        <Text className="text-stone-400 font-bold text-xs uppercase tracking-widest">Review Book</Text>
+        <View className="w-10" />
+      </View>
+
       <View className="items-center mb-6">
         <View className="shadow-lg shadow-black/20 bg-white rounded-lg mb-4">
            {info.imageLinks?.thumbnail ? (
@@ -116,62 +163,77 @@ export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFor
         <Text className="text-stone-500 text-sm mt-1">{info.authors?.[0]}</Text>
       </View>
 
-      {/* Format Selector */}
-      <View className="flex-row bg-stone-100 p-1 rounded-xl mb-6">
-        <TouchableOpacity 
-          onPress={() => setFormat('physical')}
-          className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${format === 'physical' ? 'bg-white shadow-sm' : ''}`}
-        >
-          <MaterialCommunityIcons name="book-open-page-variant" size={20} color={format === 'physical' ? '#EA580C' : '#78716C'} />
-          <Text className={`ml-2 font-bold ${format === 'physical' ? 'text-stone-800' : 'text-stone-500'}`}>Physical</Text>
-        </TouchableOpacity>
-        
-        <TouchableOpacity 
-          onPress={() => setFormat('audio')}
-          className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${format === 'audio' ? 'bg-white shadow-sm' : ''}`}
-        >
-          <MaterialCommunityIcons name="headphones" size={20} color={format === 'audio' ? '#EA580C' : '#78716C'} />
-          <Text className={`ml-2 font-bold ${format === 'audio' ? 'text-stone-800' : 'text-stone-500'}`}>Audio</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Inputs */}
-      <View className="mb-8">
-        <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest">
-          {format === 'physical' ? 'Total Pages' : 'Duration (Minutes)'}
-        </Text>
-        <View className="bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 flex-row items-center">
-          <TextInput
-            value={totalUnits}
-            onChangeText={setTotalUnits}
-            keyboardType="number-pad"
-            className="flex-1 text-lg font-bold text-stone-800"
-          />
-          <Text className="text-stone-400 text-sm">{format === 'physical' ? 'Pages' : 'Mins'}</Text>
+      <View className="mb-6">
+        <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest text-center">Shelf Status</Text>
+        <View className="flex-row bg-stone-100 p-1 rounded-xl">
+            <TouchableOpacity 
+            onPress={() => setStatus('active')}
+            className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${status === 'active' ? 'bg-white shadow-sm' : ''}`}
+            >
+            <View className={`w-2 h-2 rounded-full mr-2 ${status === 'active' ? 'bg-green-500' : 'bg-stone-400'}`} />
+            <Text className={`font-bold ${status === 'active' ? 'text-stone-800' : 'text-stone-500'}`}>Reading Now</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+            onPress={() => setStatus('wishlist')}
+            className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${status === 'wishlist' ? 'bg-white shadow-sm' : ''}`}
+            >
+            <View className={`w-2 h-2 rounded-full mr-2 ${status === 'wishlist' ? 'bg-blue-400' : 'bg-stone-400'}`} />
+            <Text className={`font-bold ${status === 'wishlist' ? 'text-stone-800' : 'text-stone-500'}`}>Wishlist</Text>
+            </TouchableOpacity>
         </View>
       </View>
 
-      {/* Footer Actions */}
-      <View className="mt-auto">
+      <View className="flex-row gap-4 mb-8">
+        <View className="flex-1">
+            <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest">Format</Text>
+            <View className="flex-row bg-stone-100 p-1 rounded-xl h-[58px]">
+                <TouchableOpacity 
+                onPress={() => setFormat('physical')}
+                className={`flex-1 items-center justify-center rounded-lg ${format === 'physical' ? 'bg-white shadow-sm' : ''}`}
+                >
+                <MaterialCommunityIcons name="book-open-page-variant" size={24} color={format === 'physical' ? '#EA580C' : '#78716C'} />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                onPress={() => setFormat('audio')}
+                className={`flex-1 items-center justify-center rounded-lg ${format === 'audio' ? 'bg-white shadow-sm' : ''}`}
+                >
+                <MaterialCommunityIcons name="headphones" size={24} color={format === 'audio' ? '#EA580C' : '#78716C'} />
+                </TouchableOpacity>
+            </View>
+        </View>
+
+        <View className="flex-1">
+            <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest">
+              {format === 'physical' ? 'Total Pages' : 'Mins'}
+            </Text>
+            <View className="bg-white border border-stone-200 rounded-xl px-4 py-3 flex-row items-center h-[58px]">
+              <TextInput
+                value={totalUnits}
+                onChangeText={setTotalUnits}
+                keyboardType="number-pad"
+                className="flex-1 text-lg font-bold text-stone-800"
+              />
+            </View>
+        </View>
+      </View>
+
+      <View className="mt-4 pb-20">
         <TouchableOpacity 
           onPress={handleSave}
           disabled={isSaving}
-          className="bg-orange-600 py-4 rounded-xl flex-row items-center justify-center mb-3 shadow-sm shadow-orange-200"
+          className="bg-stone-800 py-4 rounded-xl flex-row items-center justify-center mb-3 shadow-lg"
         >
           {isSaving ? (
              <ActivityIndicator color="white" />
           ) : (
              <>
-               <MaterialCommunityIcons name="check-circle" size={20} color="white" />
-               <Text className="text-white font-bold ml-2 text-lg">Start Reading</Text>
+               <MaterialCommunityIcons name="plus-circle" size={20} color="white" />
+               <Text className="text-white font-bold ml-2 text-lg">Add to Library</Text>
              </>
           )}
         </TouchableOpacity>
-        
-        <TouchableOpacity onPress={onClose} disabled={isSaving} className="py-3 items-center">
-          <Text className="text-stone-400 font-bold">Cancel</Text>
-        </TouchableOpacity>
       </View>
-    </View>
+    </ScrollView>
   );
 }
