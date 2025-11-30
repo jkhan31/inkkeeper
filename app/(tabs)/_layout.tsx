@@ -60,21 +60,21 @@ export default function TabLayout() {
 
       {/* 3. READ (Custom Button) */}
       <Tabs.Screen
-        name="read_placeholder" // Dummy route, we override the button
+        name="read_placeholder"
         options={{
           title: '',
           tabBarButton: (props) => (
-            <CustomReadButton onPress={() => router.push('/log-session')}>
+            <CustomReadButton {...props}>
               <MaterialCommunityIcons name="book-open-page-variant" size={30} color="white" />
             </CustomReadButton>
           ),
         }}
-        listeners={() => ({
+        listeners={{
           tabPress: (e) => {
-            e.preventDefault(); // Prevent navigating to the placeholder
-            router.push('/log-session'); // Go to the timer screen instead
+            e.preventDefault();
+            router.navigate('/log-session');
           },
-        })}
+        }}
       />
 
       {/* 4. Stats */}
