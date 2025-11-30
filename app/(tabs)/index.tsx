@@ -1,101 +1,27 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, ScrollView, Image, ActivityIndicator, RefreshControl } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { router, useFocusEffect } from 'expo-router';
-import { supabase } from '../../lib/supabase';
-import { PET_DATA } from '../../constants/pets'; // Import Pet Rules
+import { router } from 'expo-router';
 
-import PetDisplay from '../../components/PetDisplay';
-import BookSearchModal from '../../components/BookSearchModal';
+// 1. Import the "Chef"
+import { useHomeData } from '@/hooks/useHomeData';
+
+import PetDisplay from '@/components/PetDisplay';
+import BookSearchModal from '@/components/BookSearchModal';
 
 export default function HomeScreen() {
+  // UI State (Modals, etc.) stays here
   const [isSearchVisible, setSearchVisible] = useState(false);
-  const [activeBook, setActiveBook] = useState<any>(null);
-  const [inkDrops, setInkDrops] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
 
-  // --- PET LOGIC ---
-  const species = PET_DATA['fox'];
-  const currentStage = species.stages.find((s: any) => inkDrops < s.limit) || species.stages[species.stages.length - 1];
-  
-  // Calculate Progress to Next Level
-  const stageIndex = species.stages.indexOf(currentStage);
-  const prevLimit = stageIndex === 0 ? 0 : species.stages[stageIndex - 1].limit;
-  const nextLimit = currentStage.limit;
-  const progressPercent = Math.min(Math.max(((inkDrops - prevLimit) / (nextLimit - prevLimit)) * 100, 0), 100);
-  // ----------------
-
-  useFocusEffect(
-    useCallback(() => {
-      fetchProfileData();
-    }, [])
-  );
-
-  const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await fetchProfileData();
-    setRefreshing(false);
-  }, []);
-
-  const fetchProfileData = async () => {
-    try {
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) return;
-
-      // 1. Get Profile (Use maybeSingle to avoid crashing if new user)
-      let { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('ink_drops, active_book_id')
-        .eq('id', user.id)
-        .maybeSingle(); // <--- CHANGED FROM .single()
-      
-      if (profileError) throw profileError;
-
-      // 2. SELF-HEALING: If no profile exists, create one now
-      if (!profile) {
-        console.log("No profile found. Creating one...");
-        const { data: newProfile, error: createError } = await supabase
-          .from('profiles')
-          .insert({ id: user.id, email: user.email }) // Create the row
-          .select('ink_drops, active_book_id')
-          .single();
-        
-        if (createError) throw createError;
-        profile = newProfile;
-      }
-
-      setInkDrops(profile?.ink_drops || 0);
-
-      // 3. Get Book Details (if ID exists)
-      if (profile?.active_book_id) {
-        const { data: book, error: bookError } = await supabase
-          .from('books')
-          .select('*')
-          .eq('id', profile.active_book_id)
-          .single();
-        
-        if (bookError) console.error("Book Error", bookError);
-        setActiveBook(book);
-      } else {
-        setActiveBook(null);
-      }
-
-    } catch (error) {
-      console.error("Home Fetch Error:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // 2. Order the data from the "Chef"
+  const { loading, refreshing, refresh, inkDrops, activeBook, petData } = useHomeData();
 
   return (
     <SafeAreaView className="flex-1 bg-stone-100">
       <ScrollView 
         contentContainerStyle={{ padding: 20 }}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#EA580C" />
-        }
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} tintColor="#EA580C" />}
       >
         
         {/* Header */}
@@ -106,23 +32,22 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* The Pet Section (Dynamic) */}
+        {/* Pet Section - Clean & Readable */}
         <View className="items-center mb-10">
           <PetDisplay xp={inkDrops} />
           
           <Text className="mt-4 text-xl font-serif text-stone-800">
-             {species.name} {currentStage.label}
+             {petData.name} {petData.stageLabel}
           </Text>
           
-          {/* Dynamic Progress Bar */}
           <View className="bg-stone-200 h-2 w-32 rounded-full mt-2 overflow-hidden">
             <View 
               className="bg-emerald-700 h-full" 
-              style={{ width: `${progressPercent}%` }} 
+              style={{ width: `${petData.progressPercent}%` }} 
             />
           </View>
           <Text className="text-stone-500 text-sm mt-1">
-            {inkDrops} / {currentStage.limit} Ink
+            {inkDrops} / {petData.currentLimit} Ink
           </Text>
         </View>
 
@@ -177,7 +102,7 @@ export default function HomeScreen() {
           )}
         </View>
 
-        {/* Log New Book */}
+        {/* Log New Book Button */}
         <TouchableOpacity 
           onPress={() => setSearchVisible(true)}
           className="bg-stone-800 flex-row items-center justify-center py-4 rounded-xl"

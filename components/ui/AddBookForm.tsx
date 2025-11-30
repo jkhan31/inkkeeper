@@ -1,3 +1,4 @@
+// components/ui/AddBookForm.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, TextInput, ActivityIndicator, Alert, ScrollView } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -10,10 +11,14 @@ interface AddBookFormProps {
 }
 
 export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFormProps) {
+  // Defensive coding: handle both raw Google Books item or just volumeInfo
   const info = bookData.volumeInfo || bookData;
   
   const [format, setFormat] = useState<'physical' | 'audio'>('physical');
   const [status, setStatus] = useState<'active' | 'wishlist'>('active'); 
+  // 🆕 NEW: Genre Type (Critical for Blueprint v6.2)
+  const [genreType, setGenreType] = useState<'fiction' | 'non-fiction'>('non-fiction');
+  
   const [totalUnits, setTotalUnits] = useState(info.pageCount?.toString() || '300');
   const [isSaving, setIsSaving] = useState(false);
   const [loadingChecks, setLoadingChecks] = useState(true);
@@ -21,7 +26,20 @@ export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFor
 
   useEffect(() => {
     performPreChecks();
+    attemptGenreDetection();
   }, [info.title]);
+
+  // 🧠 LOGIC: Try to guess genre from Google Books Categories
+  const attemptGenreDetection = () => {
+    if (info.categories && info.categories.length > 0) {
+      const catString = info.categories[0].toLowerCase();
+      if (catString.includes('fiction') && !catString.includes('non-fiction')) {
+        setGenreType('fiction');
+      } else {
+        setGenreType('non-fiction');
+      }
+    }
+  };
 
   const performPreChecks = async () => {
     try {
@@ -34,12 +52,14 @@ export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFor
         .eq('id', user.id)
         .single();
 
+      // If user is already reading a book, default new ones to wishlist
       if (profile?.active_book_id) {
         setStatus('wishlist');
       } else {
         setStatus('active');
       }
 
+      // Check for duplicates
       const { data: duplicates } = await supabase
         .from('books')
         .select('id')
@@ -92,13 +112,16 @@ export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFor
           cover_url: info.imageLinks?.thumbnail,
           total_units: Number(totalUnits),
           format: format,
-          status: status, 
+          status: status,
+          genre_type: genreType, // 👈 SAVING THE GENRE
+          current_unit: 0,
         })
         .select()
         .single();
 
       if (bookError) throw bookError;
 
+      // If making it active, update profile immediately
       if (status === 'active') {
         const { error: profileError } = await supabase
           .from('profiles')
@@ -129,9 +152,9 @@ export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFor
   return (
     <ScrollView 
       className="flex-1 px-1" 
-      showsVerticalScrollIndicator={true} // <--- ENABLED SCROLLBAR
-      indicatorStyle="black"              // <--- DARK SCROLLBAR FOR iOS
-      contentContainerStyle={{ paddingBottom: 40 }} // <--- EXTRA PADDING AT BOTTOM
+      showsVerticalScrollIndicator={true}
+      indicatorStyle="black"
+      contentContainerStyle={{ paddingBottom: 40 }}
     >
       
       <View className="flex-row justify-between items-center mb-2 mt-2">
@@ -163,27 +186,47 @@ export default function AddBookForm({ bookData, onClose, onSuccess }: AddBookFor
         <Text className="text-stone-500 text-sm mt-1">{info.authors?.[0]}</Text>
       </View>
 
-      <View className="mb-6">
-        <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest text-center">Shelf Status</Text>
-        <View className="flex-row bg-stone-100 p-1 rounded-xl">
-            <TouchableOpacity 
-            onPress={() => setStatus('active')}
-            className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${status === 'active' ? 'bg-white shadow-sm' : ''}`}
-            >
-            <View className={`w-2 h-2 rounded-full mr-2 ${status === 'active' ? 'bg-green-500' : 'bg-stone-400'}`} />
-            <Text className={`font-bold ${status === 'active' ? 'text-stone-800' : 'text-stone-500'}`}>Reading Now</Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity 
-            onPress={() => setStatus('wishlist')}
-            className={`flex-1 flex-row items-center justify-center py-3 rounded-lg ${status === 'wishlist' ? 'bg-white shadow-sm' : ''}`}
-            >
-            <View className={`w-2 h-2 rounded-full mr-2 ${status === 'wishlist' ? 'bg-blue-400' : 'bg-stone-400'}`} />
-            <Text className={`font-bold ${status === 'wishlist' ? 'text-stone-800' : 'text-stone-500'}`}>Wishlist</Text>
-            </TouchableOpacity>
+      {/* STATUS & GENRE ROW */}
+      <View className="flex-row gap-4 mb-6">
+        {/* Status Toggle */}
+        <View className="flex-1">
+            <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest text-center">Shelf</Text>
+            <View className="bg-stone-100 p-1 rounded-xl">
+                {['active', 'wishlist'].map((s) => (
+                    <TouchableOpacity 
+                        key={s}
+                        onPress={() => setStatus(s as any)}
+                        className={`items-center justify-center py-2 rounded-lg mb-1 ${status === s ? 'bg-white shadow-sm' : ''}`}
+                    >
+                        <Text className={`font-bold capitalize ${status === s ? 'text-stone-800' : 'text-stone-500'}`}>
+                            {s === 'active' ? 'Reading' : 'Wishlist'}
+                        </Text>
+                    </TouchableOpacity>
+                ))}
+            </View>
+        </View>
+
+        {/* 🆕 Genre Toggle */}
+        <View className="flex-1">
+            <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest text-center">Type</Text>
+            <View className="bg-stone-100 p-1 rounded-xl">
+                <TouchableOpacity 
+                    onPress={() => setGenreType('non-fiction')}
+                    className={`items-center justify-center py-2 rounded-lg mb-1 ${genreType === 'non-fiction' ? 'bg-white shadow-sm' : ''}`}
+                >
+                    <Text className={`font-bold ${genreType === 'non-fiction' ? 'text-stone-800' : 'text-stone-500'}`}>Non-Fic</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                    onPress={() => setGenreType('fiction')}
+                    className={`items-center justify-center py-2 rounded-lg ${genreType === 'fiction' ? 'bg-white shadow-sm' : ''}`}
+                >
+                    <Text className={`font-bold ${genreType === 'fiction' ? 'text-stone-800' : 'text-stone-500'}`}>Fiction</Text>
+                </TouchableOpacity>
+            </View>
         </View>
       </View>
 
+      {/* FORMAT & PAGES ROW */}
       <View className="flex-row gap-4 mb-8">
         <View className="flex-1">
             <Text className="text-xs uppercase text-stone-400 font-bold mb-2 tracking-widest">Format</Text>
