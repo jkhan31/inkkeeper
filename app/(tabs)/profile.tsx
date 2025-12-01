@@ -47,7 +47,7 @@ export default function ProfileScreen() {
         joined_at: user.created_at
       });
       
-      // 2. Fetch Companions: Get all pets EXCEPT the active one (for the Sanctuary)
+      // 2. Fetch Companions: Get all companions EXCEPT the active one (for the Sanctuary)
       const { data: companionData } = await supabase
         .from('companions')
         .select('*')
@@ -234,12 +234,12 @@ export default function ProfileScreen() {
           <Text className="text-lg font-serif text-stone-800 mb-4">Past Companions (Sanctuary)</Text>
           {companions.length > 0 ? (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-              {companions.map((pet) => (
-                <View key={pet.id} className="mr-4 items-center">
+              {companions.map((companion) => (
+                <View key={companion.id} className="mr-4 items-center">
                   <View className="w-16 h-16 bg-stone-200 rounded-full items-center justify-center border-2 border-stone-300">
                      <MaterialCommunityIcons name="dog-side" size={30} color="#78716C" />
                   </View>
-                  <Text className="text-xs text-stone-500 mt-2 font-bold">{pet.nickname || 'Unknown'}</Text>
+                  <Text className="text-xs text-stone-500 mt-2 font-bold">{companion.nickname || 'Unknown'}</Text>
                 </View>
               ))}
             </ScrollView>

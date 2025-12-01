@@ -1,4 +1,4 @@
-export const PET_DATA: Record<string, any> = {
+export const COMPANION_DATA: Record<string, any> = {
   fox: {
     id: 'fox',
     name: 'Rusty',

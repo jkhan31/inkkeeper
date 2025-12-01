@@ -1,11 +1,11 @@
-// components/PetDisplay.tsx
+// components/CompanionDisplay.tsx
 
 import { View, Text } from 'react-native';
 // Assuming NativeWind is set up for tailwind classes
 
-interface PetDisplayProps {
+interface CompanionDisplayProps {
   currentXP: number;
-  petName: string;
+  companionName: string;
 }
 
 interface Stage {
@@ -14,8 +14,8 @@ interface Stage {
     color: string;
 }
 
-// Define the pet evolution stages and their properties
-const petStages: Stage[] = [
+// Define the companion evolution stages and their properties
+const companionStages: Stage[] = [
     // Must match the progression logic in useHomeData.ts
     { limit: 250, label: 'Rough Sketch', color: 'bg-gray-200' },
     { limit: 1000, label: 'Bold Line Art', color: 'bg-blue-200' },
@@ -24,14 +24,14 @@ const petStages: Stage[] = [
 ];
 
 
-export default function PetDisplay({ currentXP, petName }: PetDisplayProps) {
+export default function CompanionDisplay({ currentXP, companionName }: CompanionDisplayProps) {
 
     // 1. Determine Current Stage (Fixed implicit 'any' error)
-    const currentStage = petStages.find((stage: Stage) => currentXP < stage.limit) || petStages[petStages.length - 1];
+    const currentStage = companionStages.find((stage: Stage) => currentXP < stage.limit) || companionStages[companionStages.length - 1];
     
     // 2. Calculate Progress
-    const stageIndex = petStages.indexOf(currentStage);
-    const prevLimit = stageIndex === 0 ? 0 : petStages[stageIndex - 1].limit;
+    const stageIndex = companionStages.indexOf(currentStage);
+    const prevLimit = stageIndex === 0 ? 0 : companionStages[stageIndex - 1].limit;
     const nextLimit = currentStage.limit;
 
     const progressRange = nextLimit - prevLimit;
@@ -52,7 +52,7 @@ export default function PetDisplay({ currentXP, petName }: PetDisplayProps) {
             </View>
 
             {/* Name */}
-            <Text className="text-3xl font-bold text-stone-800 mt-4">{petName}</Text>
+            <Text className="text-3xl font-bold text-stone-800 mt-4">{companionName}</Text>
             <Text className="text-lg text-stone-600 mb-4">Stage: {currentStage.label}</Text>
 
             {/* Progress Bar */}

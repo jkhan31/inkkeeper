@@ -7,7 +7,7 @@ import { router } from 'expo-router';
 // 1. Import the "Chef"
 import { useHomeData } from '@/hooks/useHomeData';
 
-import PetDisplay from '@/components/PetDisplay';
+import CompanionDisplay from '@/components/CompanionDisplay';
 import BookSearchModal from '@/components/BookSearchModal';
 
 export default function HomeScreen() {
@@ -15,7 +15,7 @@ export default function HomeScreen() {
   const [isSearchVisible, setSearchVisible] = useState(false);
 
   // 2. Order the data from the "Chef"
-  const { loading, refreshing, refresh, inkDrops, activeBook, petData } = useHomeData();
+  const { loading, refreshing, refresh, inkDrops, activeBook, companionData } = useHomeData();
 
   return (
     <SafeAreaView className="flex-1 bg-stone-100">
@@ -32,22 +32,22 @@ export default function HomeScreen() {
           </View>
         </View>
 
-        {/* Pet Section - Clean & Readable */}
+        {/* Companion Section - Clean & Readable */}
         <View className="items-center mb-10">
-          <PetDisplay xp={inkDrops} />
+          <CompanionDisplay currentXP={inkDrops} companionName={companionData.name} />
           
           <Text className="mt-4 text-xl font-serif text-stone-800">
-             {petData.name} {petData.stageLabel}
+             {companionData.name} {companionData.stageLabel}
           </Text>
           
           <View className="bg-stone-200 h-2 w-32 rounded-full mt-2 overflow-hidden">
             <View 
               className="bg-emerald-700 h-full" 
-              style={{ width: `${petData.progressPercent}%` }} 
+              style={{ width: `${companionData.progressPercent}%` }} 
             />
           </View>
           <Text className="text-stone-500 text-sm mt-1">
-            {inkDrops} / {petData.currentLimit} Ink
+            {inkDrops} / {companionData.currentLimit} Ink
           </Text>
         </View>
 

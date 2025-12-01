@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useFocusEffect } from 'expo-router';
-import { PET_DATA } from '@/constants/pets'; // Keep your constants
+import { COMPANION_DATA } from '@/constants/companions'; 
 
 export function useHomeData() {
   const [loading, setLoading] = useState(true);
@@ -10,7 +10,7 @@ export function useHomeData() {
   // Data State
   const [inkDrops, setInkDrops] = useState(0);
   const [activeBook, setActiveBook] = useState<any>(null);
-  const [petData, setPetData] = useState({
+  const [companionData, setCompanionData] = useState({
     name: 'Fox',
     stageLabel: 'Egg',
     progressPercent: 0,
@@ -42,15 +42,15 @@ export function useHomeData() {
       const currentInk = profile?.ink_drops || 0;
       setInkDrops(currentInk);
 
-      // 2. Calculate Pet Logic (Moved out of UI)
-      const species = PET_DATA['fox'];
+      // 2. Calculate Companion Logic (Moved out of UI)
+      const species = COMPANION_DATA['fox'];
       const currentStage = species.stages.find((s: any) => currentInk < s.limit) || species.stages[species.stages.length - 1];
       const stageIndex = species.stages.indexOf(currentStage);
       const prevLimit = stageIndex === 0 ? 0 : species.stages[stageIndex - 1].limit;
       const nextLimit = currentStage.limit;
       const percent = Math.min(Math.max(((currentInk - prevLimit) / (nextLimit - prevLimit)) * 100, 0), 100);
 
-      setPetData({
+      setCompanionData({
         name: species.name,
         stageLabel: currentStage.label,
         progressPercent: percent,
@@ -94,6 +94,6 @@ export function useHomeData() {
     refresh, 
     inkDrops, 
     activeBook, 
-    petData 
+    companionData 
   };
 }
