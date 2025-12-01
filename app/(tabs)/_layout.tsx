@@ -3,10 +3,10 @@ import React from 'react';
 import { Platform, View, TouchableOpacity, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// Custom "Raised" Button Component
-const CustomReadButton = ({ children, onPress }: any) => (
+// Custom "Raised" Button Component - Updated to accept all props
+const CustomReadButton = ({ children, ...props }: any) => (
   <TouchableOpacity
-    onPress={onPress}
+    {...props} // ⬅️ Pass ALL props (including onPress) to the TouchableOpacity
     style={{
       top: -20, // Move it up
       justifyContent: 'center',
@@ -60,21 +60,25 @@ export default function TabLayout() {
 
       {/* 3. READ (Custom Button) */}
       <Tabs.Screen
-        name="read_placeholder"
-        options={{
-          title: '',
-          tabBarButton: (props) => (
-            <CustomReadButton {...props}>
-              <MaterialCommunityIcons name="book-open-page-variant" size={30} color="white" />
-            </CustomReadButton>
-          ),
-        }}
-        listeners={{
-          tabPress: (e) => {
-            e.preventDefault();
-            router.navigate('/log-session');
-          },
-        }}
+      name="read_placeholder" 
+      options={{
+        title: '',
+        tabBarButton: (props) => (
+          // Pass the entire props object to the CustomReadButton
+          <CustomReadButton {...props}> 
+            <MaterialCommunityIcons name="book-open-page-variant" size={30} color="white" />
+          </CustomReadButton>
+        ),
+      }}
+      // 🚀 CRITICAL: The listener handles the navigation
+      listeners={() => ({
+        tabPress: (e) => {
+          e.preventDefault(); // 🛑 1. STOP default navigation to the placeholder tab
+
+          // 2. Explicitly navigate to the external screen (log-session)
+          router.navigate('/log-session'); 
+        },
+      })}
       />
 
       {/* 4. Stats */}

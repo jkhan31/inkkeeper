@@ -28,19 +28,17 @@ export default function RootLayout() {
   useEffect(() => {
     if (!initialized) return;
 
-    // We only protect the tabs and the root index path
-    const inAuthGroup = segments[0] === '(tabs)';
+    const inTabsGroup = segments[0] === '(tabs)';
+    const inLogSession = segments[0] === 'log-session';
+    const inModal = segments[0] === 'modal';
     
-    if (session && !inAuthGroup) {
-      // If Logged In -> Go to Home
+    if (session && !inTabsGroup && !inLogSession && !inModal) {
+      // If Logged In -> Go to Home (unless in allowed screens)
       router.replace('/(tabs)');
-    } else if (!session && inAuthGroup) {
+    } else if (!session && inTabsGroup) {
       // If Logged Out -> Go to Login
       router.replace('/login');
     }
-    
-    // CRITICAL: We also need to allow the router to see the log-session screen
-    // so we don't redirect if the user is logged in and pushing to /log-session
   }, [session, initialized, segments]);
 
   if (!initialized) {
@@ -60,6 +58,7 @@ export default function RootLayout() {
           headerShown: false,
         }} 
       />
+      <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
     </Stack>
   );
 }
