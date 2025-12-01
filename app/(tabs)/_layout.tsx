@@ -81,12 +81,12 @@ export default function TabLayout() {
       })}
       />
 
-      {/* 4. Stats */}
+      {/* 4. JOURNAL (Replaces Stats) */}
       <Tabs.Screen
-        name="stats"
+        name="journal" // ⬅️ The new file name (journal.tsx)
         options={{
-          title: 'Stats',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="chart-bar" size={26} color={color} />,
+          title: 'Journal',
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="feather" size={26} color={color} />, // Feather icon is great for journaling
         }}
       />
 
