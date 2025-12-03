@@ -99,7 +99,7 @@ export default function SignUpScreen() {
       </TouchableOpacity>
       
       {/* Link to Login */}
-      <TouchableOpacity onPress={() => router.push('/login/login')} className="mt-8">
+      <TouchableOpacity onPress={() => router.push('/login')} className="mt-8">
         <Text className="text-sumiInk text-sm underline">Already have an account? Log in.</Text>
       </TouchableOpacity>
 

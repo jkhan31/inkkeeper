@@ -31,7 +31,7 @@ export default function LoginScreen() {
         });
         if (error) throw error;
         // Success -> Go to Tabs
-        router.replace('/(tabs)/');
+        router.replace('/(tabs)');
       }
     } catch (error: any) {
       Alert.alert("Error", error.message);

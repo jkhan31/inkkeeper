@@ -1,11 +1,15 @@
-// app/log-session/index.tsx
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TouchableOpacity, TextInput, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, AppState, AppStateStatus } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+// Filename: app/log-session/index.tsx
+// Purpose: Handles the active reading session (Timer -> Reflection -> Atomic Save).
+// FIXED: Removed all Unit/Page inputs.
+// FIXED: Implemented Time-Only Reward Logic (1 Ink/min, 5 XP/min).
+// FIXED: Calls 'log_session_atomic' RPC directly.
+
 import { supabase } from '@/lib/supabase';
-import { saveReadingSession } from '@/lib/session';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, AppState, AppStateStatus, KeyboardAvoidingView, Platform, ScrollView, Switch, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Helper component for timer display
 function TimerDisplay({ seconds }: { seconds: number }) {
@@ -30,81 +34,83 @@ function TimerDisplay({ seconds }: { seconds: number }) {
 export default function LogSessionScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const bookId = params.bookId as string;
+  const bookIdParam = params.bookId as string;
 
   // -- STATE --
   const [loading, setLoading] = useState(true);
   const [book, setBook] = useState<any>(null);
+  const [activeCompanionId, setActiveCompanionId] = useState<string | null>(null);
+  
+  // Timer State
   const [timerActive, setTimerActive] = useState(false);
   const [seconds, setSeconds] = useState(0);
   
   // UI Flow State
-  const [stage, setStage] = useState<'timer' | 'input'>('timer');
+  const [stage, setStage] = useState<'timer' | 'reflection'>('timer');
   
   // Form State
-  const [startUnit, setStartUnit] = useState('');
-  const [endUnit, setEndUnit] = useState('');
   const [reflection, setReflection] = useState('');
+  const [isFinished, setIsFinished] = useState(false); // New "Finish Book" toggle
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Background Tracking Refs
   const appState = useRef(AppState.currentState);
   const backgroundTimestamp = useRef<number | null>(null);
 
-  // -- 1. FETCH BOOK DETAILS & AUTH CHECK --
+  // -- 1. FETCH DATA (Book + Companion) --
   useEffect(() => {
-    async function fetchBook() {
+    async function initSession() {
       try {
-        let { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await supabase.auth.getUser();
         if (!user) {
             router.replace('/login'); 
             return;
         }
 
-        let bookIdToLoad = bookId;
-
-        if (!bookIdToLoad) {
-          // Fallback: If no bookId passed, get active book from profile
-          const { data: profile } = await supabase
+        // A. Get Profile (to find active book & companion)
+        const { data: profile } = await supabase
             .from('profiles')
-            .select('active_book_id')
+            .select('active_book_id, active_companion_id')
             .eq('id', user.id)
             .single();
-          
-          if (profile?.active_book_id) {
-            bookIdToLoad = profile.active_book_id;
-          } else {
-            Alert.alert(
+
+        if (!profile) throw new Error("Profile not found");
+        setActiveCompanionId(profile.active_companion_id);
+
+        // B. Determine Book ID
+        const targetBookId = bookIdParam || profile.active_book_id;
+
+        if (!targetBookId) {
+             Alert.alert(
               "No Active Book",
               "Please select a book from your library to start reading.",
               [{ text: "Go to Library", onPress: () => router.replace('/(tabs)/library') }]
             );
             return;
-          }
         }
 
-        const { data } = await supabase
-          .from('books')
-          .select('*')
-          .eq('id', bookIdToLoad)
-          .single();
-          
-        if (data) {
-          setBook(data);
-          const start = data.current_unit || 0;
-          setStartUnit(start.toString());
-        } else {
-          Alert.alert("Error", "Could not find book details.");
-          router.back();
-        }
-      } catch (e) {
-        console.error("Fetch Book Error:", e);
+        // C. Fetch Book Details (Only needed columns)
+        const { data: bookData, error: bookError } = await supabase
+            .from('books')
+            .select('id, title, user_id, status')
+            .eq('id', targetBookId)
+            .single();
+            
+        if (bookError || !bookData) throw bookError;
+        
+        setBook(bookData);
+        // If book is already finished, default the toggle to true? Maybe not, usually re-reading.
+        
+      } catch (e: any) {
+        console.error("Session Init Error:", e);
+        Alert.alert("Error", "Could not initialize session.");
+        router.back();
       } finally {
         setLoading(false);
       }
     }
-    fetchBook();
-  }, [bookId]);
+    initSession();
+  }, [bookIdParam]);
 
   // -- 2. TIMER LOGIC --
   useEffect(() => {
@@ -140,22 +146,19 @@ export default function LogSessionScreen() {
     appState.current = nextAppState;
   };
 
-  // -- 4. NAVIGATION HANDLERS --
+  // -- 4. HANDLERS --
   const handleBack = () => {
-    // Stage 2 -> Stage 1
-    if (stage === 'input') {
+    if (stage === 'reflection') {
       setStage('timer');
       return;
     }
-
-    // Confirmation if timer has started
     if (seconds > 0 && !isSubmitting) {
       Alert.alert(
         "End Session?",
-        "You have a session in progress. Leaving now will discard it.",
+        "Leaving now will discard this session.",
         [
           { text: "Keep Reading", style: "cancel" },
-          { text: "Discard & Exit", style: "destructive", onPress: () => router.back() }
+          { text: "Discard", style: "destructive", onPress: () => router.back() }
         ]
       );
     } else {
@@ -163,66 +166,73 @@ export default function LogSessionScreen() {
     }
   };
 
-  // -- 5. STAGE TRANSITION (Timer -> Input) --
-  const handleCompleteTimer = () => {
-    setTimerActive(false); // Pause timer
-    setStage('input'); // Switch UI to input mode
+  const handleStopTimer = () => {
+    setTimerActive(false);
+    setStage('reflection');
   };
 
-  // -- 6. FINAL SUBMISSION --
+  // -- 5. FINAL SUBMISSION (ATOMIC) --
   const handleSubmitSession = async () => {
-    if (!endUnit) {
-      Alert.alert("Missing Info", "Please enter where you stopped reading.");
-      return;
+    if (!activeCompanionId || !book) {
+        Alert.alert("Error", "Missing data to save session.");
+        return;
     }
 
-    const start = parseInt(startUnit) || 0;
-    const end = parseInt(endUnit) || 0;
-    
-    // VALIDATION
-    if (end < start) {
-      Alert.alert("Invalid Input", "End page cannot be less than the start page.");
-      return;
-    }
-    const unitsRead = end - start;
-    if (unitsRead <= 0 && seconds > 60) {
-        Alert.alert("Invalid Session", "You must have read at least one unit.");
+    if (seconds < 60) {
+        Alert.alert("Too Short", "Sessions must be at least 1 minute to count.");
         return;
     }
 
     setIsSubmitting(true);
     
-    const result = await saveReadingSession({
-      bookId: book.id,
-      durationSeconds: seconds,
-      unitsRead: unitsRead,
-      startUnit: start,
-      endUnit: end,
-      reflection: reflection
-    });
+    try {
+        // --- CALC REWARDS (Time-Only) ---
+        const minutes = Math.floor(seconds / 60);
+        const baseXP = minutes * 5; // 5 XP per min
+        const baseInk = minutes * 1; // 1 Ink per min
+        
+        // Bonus for meaningful reflection (> 50 chars)
+        const bonusInk = reflection.length > 50 ? 20 : 0;
+        
+        const totalXP = baseXP;
+        const totalInk = baseInk + bonusInk;
 
-    setIsSubmitting(false);
+        // --- CALL RPC ---
+        const { error } = await supabase.rpc('log_session_atomic', {
+            p_user_id: book.user_id,
+            p_book_id: book.id,
+            p_active_companion_id: activeCompanionId,
+            p_duration_seconds: seconds,
+            p_reflection_data: { note: reflection },
+            p_ink_gained: totalInk,
+            p_xp_gained: totalXP,
+            p_new_book_status: isFinished ? 'finished' : 'active'
+        });
 
-    if (result.success) {
-      Alert.alert(
-        "Session Recorded!",
-        `You gained +${result.inkGained} Ink and +${result.xpGained} XP!`,
-        [{ text: "Great!", onPress: () => router.replace('/(tabs)') }]
-      );
-    } else {
-      Alert.alert("Error", result.message);
+        if (error) throw error;
+
+        // Success!
+        Alert.alert(
+            "Session Recorded!",
+            `+${totalInk} Ink Drops\n+${totalXP} XP`,
+            [{ text: "Awesome", onPress: () => router.replace('/(tabs)') }]
+        );
+
+    } catch (e: any) {
+        console.error("Submit Error:", e);
+        Alert.alert("Save Failed", e.message);
+    } finally {
+        setIsSubmitting(false);
     }
   };
 
   if (loading) {
     return (
       <View className="flex-1 justify-center items-center bg-stone-100">
-        <ActivityIndicator size="large" color="#EA580C" />
+        <ActivityIndicator size="large" color="#A26FD7" />
       </View>
     );
   }
-
-  if (!book) return <View className="flex-1 bg-stone-100" />;
 
   return (
     <SafeAreaView className="flex-1 bg-stone-50">
@@ -234,37 +244,24 @@ export default function LogSessionScreen() {
           
           {/* Header Bar */}
           <View className="flex-row items-center justify-between mb-4 relative">
-             <TouchableOpacity 
-               onPress={handleBack} 
-               className="p-2 -ml-2 rounded-full active:bg-stone-200 z-10"
-             >
+             <TouchableOpacity onPress={handleBack} className="p-2 -ml-2 rounded-full active:bg-stone-200 z-10">
                 <MaterialCommunityIcons name="arrow-left" size={28} color="#57534E" />
              </TouchableOpacity>
-             
              <View className="absolute left-0 right-0 items-center pointer-events-none">
                 <Text className="text-stone-500 text-[10px] uppercase tracking-widest font-bold">Reading Session</Text>
-                <Text className="text-stone-800 font-serif font-bold text-lg" numberOfLines={1}>{book.title}</Text>
+                <Text className="text-stone-800 font-serif font-bold text-lg" numberOfLines={1}>{book?.title}</Text>
              </View>
-             
-             {/* Spacer to balance the header */}
              <View className="w-10" />
           </View>
 
-          {/* Main Content - Flex Grow to center content vertically */}
-          <ScrollView 
-            contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} 
-            showsVerticalScrollIndicator={false}
-          >
+          <ScrollView contentContainerStyle={{ flexGrow: 1, justifyContent: 'center' }} showsVerticalScrollIndicator={false}>
 
             {/* --- STAGE 1: TIMER --- */}
             {stage === 'timer' && (
               <View className="flex-1 justify-center w-full">
-                
-                {/* Large Timer Display */}
                 <View className="items-center mb-12">
                    <TimerDisplay seconds={seconds} />
                    
-                   {/* Play/Pause Controls */}
                    <View className="flex-row items-center space-x-8">
                      {!timerActive ? (
                        <TouchableOpacity 
@@ -284,45 +281,34 @@ export default function LogSessionScreen() {
                    </View>
                    
                    <Text className="mt-6 text-stone-400 font-medium tracking-wide">
-                     {timerActive ? 'Time is ticking...' : 'Ready to start?'}
+                     {timerActive ? 'Focus...' : 'Ready?'}
                    </Text>
                 </View>
 
-                {/* Start Unit Display/Edit */}
-                <View className="w-full mb-10 flex-row justify-center items-center space-x-2">
-                    <Text className="text-stone-400 font-medium">Starting on page</Text>
-                    <TextInput 
-                      value={startUnit}
-                      onChangeText={setStartUnit}
-                      keyboardType="numeric"
-                      className="bg-white border border-stone-200 px-4 py-2 rounded-lg text-stone-800 font-bold text-lg text-center min-w-[80px]"
-                    />
-                </View>
-
-                {/* Bottom Action Button */}
                  <View className="mt-auto mb-4">
                    <TouchableOpacity 
-                    onPress={handleCompleteTimer}
-                    disabled={seconds === 0}
-                    className={`w-full py-5 rounded-2xl flex-row justify-center items-center shadow-sm ${seconds === 0 ? 'bg-stone-200' : 'bg-emerald-600'}`}
+                    onPress={handleStopTimer}
+                    disabled={seconds < 60} // Require 1 min minimum
+                    className={`w-full py-5 rounded-2xl flex-row justify-center items-center shadow-sm ${seconds < 60 ? 'bg-stone-200' : 'bg-emerald-600'}`}
                   >
-                    <MaterialCommunityIcons name="flag-checkered" size={24} color={seconds === 0 ? "#A8A29E" : "white"} />
-                    <Text className={`font-bold text-lg ml-2 ${seconds === 0 ? 'text-stone-400' : 'text-white'}`}>
-                      Complete Session
+                    <MaterialCommunityIcons name="check" size={24} color={seconds < 60 ? "#A8A29E" : "white"} />
+                    <Text className={`font-bold text-lg ml-2 ${seconds < 60 ? 'text-stone-400' : 'text-white'}`}>
+                      Finish Session
                     </Text>
                   </TouchableOpacity>
+                  {seconds < 60 && seconds > 0 && <Text className="text-center text-xs text-stone-400 mt-2">Read for at least 1 minute to finish.</Text>}
                 </View>
               </View>
             )}
 
-            {/* --- STAGE 2: INPUT & REFLECTION --- */}
-            {stage === 'input' && (
+            {/* --- STAGE 2: REFLECTION & REWARDS --- */}
+            {stage === 'reflection' && (
               <View className="flex-1 w-full pt-4">
                 
-                {/* Summary Card */}
+                {/* Time Summary */}
                 <View className="bg-stone-100 p-6 rounded-3xl mb-8 flex-row justify-between items-center border border-stone-200">
                    <View>
-                     <Text className="text-stone-500 text-xs uppercase font-bold mb-1">Session Time</Text>
+                     <Text className="text-stone-500 text-xs uppercase font-bold mb-1">Total Time</Text>
                      <Text className="text-3xl font-mono font-bold text-stone-800">
                         {Math.floor(seconds / 60)}<Text className="text-sm font-sans font-normal text-stone-500">m</Text> {seconds % 60}<Text className="text-sm font-sans font-normal text-stone-500">s</Text>
                      </Text>
@@ -332,37 +318,31 @@ export default function LogSessionScreen() {
                    </View>
                 </View>
 
-                {/* Progress Input */}
-                <View className="mb-6">
-                    <View className="flex-row items-center justify-between mb-2">
-                       <Text className="text-lg font-bold text-stone-800">Progress</Text>
-                       <Text className="text-stone-400 text-sm">Started at {startUnit}</Text>
-                    </View>
-                    
-                    <View className="bg-white border-2 border-orange-500 rounded-2xl p-4 shadow-sm">
-                      <Text className="text-stone-500 text-xs font-bold uppercase mb-1 text-center text-orange-600">Enter End Page</Text>
-                      <TextInput 
-                          value={endUnit}
-                          onChangeText={setEndUnit}
-                          keyboardType="numeric"
-                          placeholder="???"
-                          autoFocus={true}
-                          className="text-stone-800 font-bold text-4xl text-center"
-                        />
-                    </View>
-                </View>
-
                 {/* Reflection Input */}
-                <View className="mb-8 flex-1">
-                   <Text className="text-stone-500 text-xs mb-2 font-bold uppercase">Quick Reflection (+20 Ink)</Text>
+                <View className="mb-6 flex-1">
+                   <Text className="text-stone-500 text-xs mb-2 font-bold uppercase">Active Recall (+20 Ink Bonus)</Text>
                    <TextInput 
                      value={reflection}
                      onChangeText={setReflection}
                      multiline
-                     placeholder="What was the most interesting part?"
+                     placeholder="What's one thing you want to remember from this session?"
                      className="bg-white border border-stone-200 p-4 rounded-xl text-stone-800 flex-1 text-lg leading-6 min-h-[120px]"
                      style={{ textAlignVertical: 'top' }}
                    />
+                </View>
+
+                {/* Finish Book Toggle */}
+                <View className="flex-row items-center justify-between bg-white p-4 rounded-xl border border-stone-200 mb-6 shadow-sm">
+                    <View className="flex-row items-center">
+                        <MaterialCommunityIcons name="book-check" size={24} color={isFinished ? "#059669" : "#A8A29E"} />
+                        <Text className="ml-3 text-stone-700 font-bold text-base">I finished the book!</Text>
+                    </View>
+                    <Switch 
+                        trackColor={{ false: "#E7E5E4", true: "#10B981" }}
+                        thumbColor={"#FFFFFF"}
+                        onValueChange={setIsFinished}
+                        value={isFinished}
+                    />
                 </View>
 
                 {/* Submit Actions */}
@@ -370,18 +350,17 @@ export default function LogSessionScreen() {
                   <TouchableOpacity 
                     onPress={handleSubmitSession}
                     disabled={isSubmitting}
-                    className={`w-full py-4 rounded-2xl flex-row justify-center items-center shadow-md mb-3 ${isSubmitting ? 'bg-stone-400' : 'bg-stone-900'}`}
+                    className={`w-full py-4 rounded-2xl flex-row justify-center items-center shadow-md mb-3 ${isSubmitting ? 'bg-stone-400' : 'bg-mainBrandColor'}`}
                   >
                     {isSubmitting ? (
                       <ActivityIndicator color="white" />
                     ) : (
                       <>
                         <MaterialCommunityIcons name="check-decagram" size={24} color="white" />
-                        <Text className="text-white font-bold text-lg ml-2">Submit & Claim Ink</Text>
+                        <Text className="text-white font-bold text-lg ml-2">Claim Rewards</Text>
                       </>
                     )}
                   </TouchableOpacity>
-                  
                 </View>
 
               </View>

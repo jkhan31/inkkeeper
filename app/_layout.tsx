@@ -1,103 +1,87 @@
-import { Stack, router, useRouter, useSegments } from 'expo-router';
-import { useEffect, useState, useCallback } from 'react';
+// Filename: app/_layout.tsx
+// Purpose: Main app navigation configuration.
+// FIXED: Ensures 'log-session' opens as a modal, preventing navigation loops.
+
+import { router, Stack, useSegments } from 'expo-router';
+import React, { useEffect, useState } from 'react';
+import { ActivityIndicator, View } from 'react-native';
 import { supabase } from '../lib/supabase';
-import { View, ActivityIndicator } from 'react-native';
 
-export default function RootLayout() {
-  const [session, setSession] = useState<any>(null);
-  const [profile, setProfile] = useState<any>(null); // State to hold the profile data
-  const [initialized, setInitialized] = useState(false);
+// --- Auth Gate Component (Guards protected routes) ---
+const AuthGate = ({ children }: { children: React.ReactNode }) => {
   const segments = useSegments();
-  const router = useRouter();
+  const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
-  // --- 1. Fetch Session and Listen for Changes ---
   useEffect(() => {
+    // Check initial auth state immediately
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
+      setIsAuth(!!session);
     });
 
+    // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
+      setIsAuth(!!session);
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
-  // --- 2. Fetch Profile Data (Runs when session changes) ---
-  const fetchProfile = useCallback(async (userId: string) => {
-    setProfile(null); // Reset profile while fetching
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('active_companion_id')
-      .eq('id', userId)
-      .single();
-
-    if (error && error.code !== 'PGRST116') { // PGRST116 means resource not found, expected for brand new signups
-        console.error("Error fetching profile:", error);
-    }
-    setProfile(data || {});
-    setInitialized(true);
-  }, []);
-
   useEffect(() => {
-    if (session) {
-      // If logged in, fetch the user's profile to check onboarding status
-      fetchProfile(session.user.id);
-    } else {
-      // If logged out, reset status
-      setProfile(null);
-      setInitialized(true);
-    }
-  }, [session, fetchProfile]);
-
-
-  // --- 3. Protection Logic (Runs after profile is initialized) ---
-  useEffect(() => {
-    // Wait until we know if the user is logged in AND we have checked their profile
-    if (!initialized) return;
-
-    const inTabsGroup = segments[0] === '(tabs)';
-    const inLogin = segments[0] === 'login';
-    const inOnboarding = segments[0] === 'onboarding';
-
-    if (session) {
-      // User is logged in. Now check onboarding status (profile is guaranteed to be loaded if session exists)
-      const hasCompletedOnboarding = profile && profile.active_companion_id;
-      
-      if (!hasCompletedOnboarding && !inOnboarding) {
-        // If logged in but MISSING companion ID, force redirect to onboarding
-        router.replace('/onboarding');
-      } else if (hasCompletedOnboarding && (inLogin || !inTabsGroup)) {
-        // If logged in AND onboarding complete, redirect to home
-        router.replace('/(tabs)');
-      }
-      
-    } else if (!session && !inLogin) {
-      // If logged out AND not on the login screen, redirect to login
+    // Protected route logic
+    const inAuthGroup = segments[0] === '(tabs)';
+    
+    // 🛑 CRITICAL FIX: EXEMPT the log-session modal from the authentication redirect loop.
+    const inModal = segments[0] === 'log-session'; // Check if we are trying to open the modal stack
+    
+    // If not authenticated and trying to access tabs, redirect to login
+    if (isAuth === false && inAuthGroup) {
       router.replace('/login');
+    } 
+    // If authenticated and trying to access login/signup, redirect to tabs
+    // EXEMPTION APPLIED HERE: If we are in a modal, don't redirect back to tabs.
+    else if (isAuth === true && !inAuthGroup && !inModal) {
+      router.replace('/(tabs)');
     }
-  }, [session, initialized, profile, segments, router]);
+  }, [isAuth, segments]);
 
-
-  if (!initialized) {
-    return <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}><ActivityIndicator /></View>;
+  if (isAuth === null) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#A26FD7" />
+      </View>
+    );
   }
 
+  return <>{children}</>;
+};
+
+// --- Main Layout Component ---
+export default function RootLayout() {
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="login" />
-      <Stack.Screen name="onboarding" /> {/* <-- New Screen Definition */}
-      <Stack.Screen name="(tabs)" />
-      
-      {/* CRITICAL FIX: Explicitly define the log-session route */}
-      <Stack.Screen 
-        name="log-session" 
-        options={{ 
-          presentation: 'modal', 
-          headerShown: false,
-        }} 
-      />
-      <Stack.Screen name="modal" options={{ presentation: 'modal' }} />
-    </Stack>
+    // Wrap the entire stack in the AuthGate for protection
+    <AuthGate>
+      <Stack>
+        {/* Login/Signup stack (Not protected) */}
+        <Stack.Screen name="login" options={{ headerShown: false }} />
+        <Stack.Screen name="login/signup" options={{ headerShown: false }} />
+        <Stack.Screen name="onboarding/index" options={{ headerShown: false }} />
+
+        {/* Main Tab Routes (Protected) */}
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+        {/* 🛑 CRITICAL FIX: Explicitly define log-session as a modal */}
+        <Stack.Screen
+          name="log-session/index"
+          options={{
+            presentation: 'modal',
+            headerShown: false,
+            title: 'Log Session',
+          }}
+        />
+        
+        {/* Modal route defined in a separate folder */}
+        <Stack.Screen name="modal" options={{ presentation: 'modal', headerShown: false }} />
+      </Stack>
+    </AuthGate>
   );
 }

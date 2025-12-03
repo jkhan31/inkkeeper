@@ -1,57 +1,50 @@
-// hooks/useStats.ts
-import { useState, useCallback } from 'react';
+// Filename: hooks/useStats.ts
+// Purpose: Fetches aggregated reading stats.
+// FIXED: Removed 'pages_read' logic. Focused purely on duration (minutes/hours).
+
 import { supabase } from '@/lib/supabase';
 import { useFocusEffect } from 'expo-router';
-
-// Define the shape of the data returned by your get_reading_summary RPC
-export interface ReadingSummary {
-  total_pages_read: number;
-  total_minutes_read: number;
-  total_sessions: number;
-  most_sessions_in_a_day: number;
-  best_day_date: string; // Date string from the RPC
-}
+import { useCallback, useState } from 'react';
 
 export function useStats() {
   const [loading, setLoading] = useState(true);
-  const [summary, setSummary] = useState<ReadingSummary | null>(null);
+  const [stats, setStats] = useState({
+    totalMinutes: 0,
+    totalSessions: 0,
+    streak: 0,
+  });
   const [error, setError] = useState<string | null>(null);
 
   const fetchStats = async () => {
-    setLoading(true);
-    setError(null);
     try {
+      setLoading(true);
+      setError(null);
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        setError("User not logged in.");
-        return;
-      }
+      if (!user) return;
 
-      // Calculate start and end dates for a full-history view
-      const endDate = new Date().toISOString();
-      const startDate = new Date(0).toISOString(); // Start from Unix Epoch (beginning of time)
+      // 1. Get Profile for Streak
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('current_streak')
+        .eq('id', user.id)
+        .single();
 
-      // 🚀 CRITICAL: Calling the Report Engine RPC
-      const { data, error: rpcError } = await supabase.rpc('get_reading_summary', {
-        p_user_id: user.id,
-        p_start_date: startDate,
-        p_end_date: endDate,
-      }).select().single();
+      // 2. Get All Sessions for Totals
+      // We only fetch duration_seconds now.
+      const { data: sessions, error: sessionError } = await supabase
+        .from('sessions')
+        .select('duration_seconds');
 
-      if (rpcError) throw rpcError;
-      
-      // The RPC returns a single row with the columns defined in the function
-      if (data) {
-        // Fix the date format for display
-        const stats: ReadingSummary = {
-          ...data,
-          best_day_date: data.best_day_date ? new Date(data.best_day_date).toLocaleDateString() : 'N/A'
-        };
-        setSummary(stats);
-      } else {
-        // This case should not happen if RPC returns COALESCE(0) but is a safeguard
-        setSummary(null);
-      }
+      if (sessionError) throw sessionError;
+
+      const totalSeconds = sessions?.reduce((sum, s) => sum + (s.duration_seconds || 0), 0) || 0;
+      const totalMinutes = Math.floor(totalSeconds / 60);
+
+      setStats({
+        totalMinutes,
+        totalSessions: sessions?.length || 0,
+        streak: profile?.current_streak || 0,
+      });
 
     } catch (e: any) {
       console.error("Stats Fetch Error:", e);
@@ -67,5 +60,5 @@ export function useStats() {
     }, [])
   );
 
-  return { loading, summary, error, refreshStats: fetchStats };
+  return { stats, loading, error, refetch: fetchStats };
 }

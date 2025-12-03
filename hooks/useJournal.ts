@@ -1,49 +1,55 @@
-// hooks/useJournal.ts
-import { useState, useCallback } from 'react';
+// Filename: hooks/useJournal.ts
+// Purpose: Fetches recent reading sessions for the Journal tab.
+// FIXED: Removed 'pages_read' from the SELECT query.
+
 import { supabase } from '@/lib/supabase';
 import { useFocusEffect } from 'expo-router';
+import { useCallback, useState } from 'react';
 
-export interface SessionLog {
+export type JournalEntry = {
   id: string;
   created_at: string;
   duration_seconds: number;
-  pages_read: number;
-  reflection_data: { note?: string } | null;
-  book_title: string;
-}
+  book: {
+    title: string;
+    cover_url: string | null;
+  } | null;
+  reflection_data: {
+    note: string;
+    prompt?: string;
+  } | null;
+};
 
 export function useJournal() {
+  const [sessions, setSessions] = useState<JournalEntry[]>([]);
   const [loading, setLoading] = useState(true);
-  const [sessions, setSessions] = useState<SessionLog[]>([]);
 
   const fetchJournal = async () => {
-    setLoading(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) return;
 
-      // Fetch all sessions and join with the books table to get the title
-      const { data: rawSessions, error } = await supabase
+      // Select session data + joined book data
+      // CRITICAL FIX: Removed 'pages_read' from selection
+      const { data, error } = await supabase
         .from('sessions')
         .select(`
-          id, created_at, duration_seconds, pages_read, reflection_data,
-          books ( title )
+          id,
+          created_at,
+          duration_seconds,
+          reflection_data,
+          book:books (
+            title,
+            cover_url
+          )
         `)
         .eq('user_id', user.id)
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(20);
 
       if (error) throw error;
-      
-      const formattedSessions: SessionLog[] = (rawSessions || []).map(s => ({
-        id: s.id,
-        created_at: s.created_at,
-        duration_seconds: s.duration_seconds,
-        pages_read: s.pages_read,
-        reflection_data: s.reflection_data,
-        book_title: s.books ? (s.books as { title: string }).title : 'Unknown Book',
-      }));
 
-      setSessions(formattedSessions);
+      setSessions(data as any);
 
     } catch (e) {
       console.error("Journal Fetch Error:", e);
@@ -58,5 +64,5 @@ export function useJournal() {
     }, [])
   );
 
-  return { loading, sessions, refreshJournal: fetchJournal };
+  return { sessions, loading, refresh: fetchJournal };
 }

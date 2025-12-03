@@ -1,19 +1,23 @@
+// Filename: app/(tabs)/_layout.tsx
+// Purpose: Main Tab Layout with customized tab bar and navigation.
+// FIXED: Directly overrides 'onPress' in the custom button to guarantee navigation to '/log-session'.
+
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs, router } from 'expo-router';
 import React from 'react';
-import { Platform, View, TouchableOpacity, Text } from 'react-native';
-import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { Platform, TouchableOpacity, View } from 'react-native';
 
-// Custom "Raised" Button Component - Updated to accept all props
+// Custom "Raised" Button Component
 const CustomReadButton = ({ children, ...props }: any) => (
   <TouchableOpacity
-    {...props} // ⬅️ Pass ALL props (including onPress) to the TouchableOpacity
+    {...props}
     style={{
-      top: -20, // Move it up
+      top: -20, // Raised effect
       justifyContent: 'center',
       alignItems: 'center',
     }}
   >
-    <View className="w-16 h-16 bg-orange-600 rounded-full items-center justify-center shadow-lg shadow-orange-900/40 border-4 border-white">
+    <View className="w-16 h-16 bg-mainBrandColor rounded-full items-center justify-center shadow-lg shadow-orange-900/40 border-4 border-white">
       {children}
     </View>
   </TouchableOpacity>
@@ -23,7 +27,7 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#EA580C',
+        tabBarActiveTintColor: '#A26FD7', // Main Brand Color
         tabBarInactiveTintColor: '#A8A29E',
         headerShown: false,
         tabBarStyle: {
@@ -58,35 +62,34 @@ export default function TabLayout() {
         }}
       />
 
-      {/* 3. READ (Custom Button) */}
+      {/* 3. READ (Custom Button Logic) */}
       <Tabs.Screen
-      name="read_placeholder" 
-      options={{
-        title: '',
-        tabBarButton: (props) => (
-          // Pass the entire props object to the CustomReadButton
-          <CustomReadButton {...props}> 
-            <MaterialCommunityIcons name="book-open-page-variant" size={30} color="white" />
-          </CustomReadButton>
-        ),
-      }}
-      // 🚀 CRITICAL: The listener handles the navigation
-      listeners={() => ({
-        tabPress: (e) => {
-          e.preventDefault(); // 🛑 1. STOP default navigation to the placeholder tab
-
-          // 2. Explicitly navigate to the external screen (log-session)
-          router.navigate('/log-session'); 
-        },
-      })}
+        name="read_placeholder"
+        options={{
+          title: '',
+          tabBarButton: (props) => (
+            <CustomReadButton
+              {...props}
+              // 🛑 CRITICAL FIX: Override the default tab press here directly
+              onPress={(e: any) => {
+                // Prevent default if the event object exists (good practice)
+                e?.preventDefault?.();
+                // 🚀 Force navigation to the modal
+                router.push('/log-session');
+              }}
+            >
+              <MaterialCommunityIcons name="book-open-page-variant" size={30} color="orange" />
+            </CustomReadButton>
+          ),
+        }}
       />
 
-      {/* 4. JOURNAL (Replaces Stats) */}
+      {/* 4. JOURNAL */}
       <Tabs.Screen
-        name="journal" // ⬅️ The new file name (journal.tsx)
+        name="journal" 
         options={{
           title: 'Journal',
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="feather" size={26} color={color} />, // Feather icon is great for journaling
+          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="feather" size={26} color={color} />,
         }}
       />
 
