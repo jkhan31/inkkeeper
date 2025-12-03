@@ -4,9 +4,9 @@
 //          This screen is the first step in the three-part authentication funnel.
 //          Successful signup triggers a redirect to the Onboarding form via app/_layout.tsx.
 
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
+import React, { useState } from 'react';
+import { ActivityIndicator, Alert, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../../lib/supabase'; // Client instance for connecting to Supabase Auth/DB
 import { cn } from '../../utils/cn'; // Utility function for conditionally joining Tailwind classes
 
