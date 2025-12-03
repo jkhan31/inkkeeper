@@ -7,7 +7,7 @@ import React, { useState, useCallback } from 'react';
 import { View, Text, TouchableOpacity, Alert, ActivityIndicator, ScrollView, TextInput, KeyboardAvoidingView, Platform } from 'react-native';
 import { router } from 'expo-router';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { supabase } from '../../lib/supabase'; // Client instance for connecting to Supabase Auth/DB (Path: app/lib/supabase)
+import { supabase } from '../lib/supabase'; // Client instance for connecting to Supabase Auth/DB (Path: app/lib/supabase)
 import { cn } from '../utils/cn'; // Utility function for conditionally joining Tailwind classes (Path: app/utils/cn)
 
 // --- Data & Constants ---

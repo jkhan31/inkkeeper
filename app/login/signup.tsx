@@ -8,7 +8,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
 import { router } from 'expo-router';
 import { supabase } from '../../lib/supabase'; // Client instance for connecting to Supabase Auth/DB
-import { cn } from '../utils/cn'; // Utility function for conditionally joining Tailwind classes
+import { cn } from '../../utils/cn'; // Utility function for conditionally joining Tailwind classes
 
 /**
  * Main component for creating a new user account via email and password.
