@@ -11,24 +11,54 @@ import { supabase } from '../lib/supabase';
 const AuthGate = ({ children }: { children: React.ReactNode }) => {
   const segments = useSegments();
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
+  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Check initial auth state immediately
+    // Check initial auth state and onboarding status
     supabase.auth.getSession().then(({ data: { session } }) => {
       setIsAuth(!!session);
+      
+      // If authenticated, check if onboarding is complete
+      if (session) {
+        checkOnboardingStatus(session.user.id);
+      }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setIsAuth(!!session);
+      
+      if (session) {
+        checkOnboardingStatus(session.user.id);
+      } else {
+        setHasCompletedOnboarding(null);
+      }
     });
 
     return () => subscription.unsubscribe();
   }, []);
 
+  const checkOnboardingStatus = async (userId: string) => {
+    try {
+      const { data } = await supabase
+        .from('profiles')
+        .select('active_companion_id')
+        .eq('id', userId)
+        .single();
+      
+      // If active_companion_id exists, onboarding is complete
+      setHasCompletedOnboarding(!!data?.active_companion_id);
+    } catch (e) {
+      console.error('Error checking onboarding status:', e);
+      setHasCompletedOnboarding(false);
+    }
+  };
+
   useEffect(() => {
     // Protected route logic
     const inAuthGroup = segments[0] === '(tabs)';
+    const inOnboarding = segments[0] === 'onboarding';
+    const inLogin = segments[0] === 'login';
     
     // 🛑 CRITICAL FIX: EXEMPT the log-session modal from the authentication redirect loop.
     const inModal = segments[0] === 'log-session'; // Check if we are trying to open the modal stack
@@ -37,14 +67,19 @@ const AuthGate = ({ children }: { children: React.ReactNode }) => {
     if (isAuth === false && inAuthGroup) {
       router.replace('/login');
     } 
-    // If authenticated and trying to access login/signup, redirect to tabs
+    // If authenticated but NOT onboarded and NOT already in login/onboarding/modal
+    else if (isAuth === true && hasCompletedOnboarding === false && !inOnboarding && !inModal && !inLogin) {
+      // Redirect to onboarding
+      router.replace('/onboarding');
+    }
+    // If authenticated and onboarded, redirect from login/onboarding to tabs
     // EXEMPTION APPLIED HERE: If we are in a modal, don't redirect back to tabs.
-    else if (isAuth === true && !inAuthGroup && !inModal) {
+    else if (isAuth === true && hasCompletedOnboarding === true && !inAuthGroup && !inModal) {
       router.replace('/(tabs)');
     }
-  }, [isAuth, segments]);
+  }, [isAuth, hasCompletedOnboarding, segments]);
 
-  if (isAuth === null) {
+  if (isAuth === null || hasCompletedOnboarding === null) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#A26FD7" />

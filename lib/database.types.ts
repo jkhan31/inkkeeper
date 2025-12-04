@@ -100,49 +100,61 @@ export type Database = {
           active_book_id: string | null
           active_companion_id: string | null
           ai_opt_in: boolean | null
+          app_version: string | null
+          country_code: string | null
           current_streak: number | null
           daily_goal_amount: number | null
-          daily_goal_unit: string | null
+          device_os: string | null
           email: string | null
-          golden_bookmarks: number | null
+          golden_bookmarks: number
           id: string
           ink_drops: number | null
           is_premium: boolean | null
-          last_read_date: string | null
+          last_session_at: string | null
           preferred_format: string | null
-          rank: number | null
+          streak_rewarded_at: number | null
+          streak_target: number | null
+          timezone: string | null
         }
         Insert: {
           active_book_id?: string | null
           active_companion_id?: string | null
           ai_opt_in?: boolean | null
+          app_version?: string | null
+          country_code?: string | null
           current_streak?: number | null
           daily_goal_amount?: number | null
-          daily_goal_unit?: string | null
+          device_os?: string | null
           email?: string | null
-          golden_bookmarks?: number | null
+          golden_bookmarks?: number
           id: string
           ink_drops?: number | null
           is_premium?: boolean | null
-          last_read_date?: string | null
+          last_session_at?: string | null
           preferred_format?: string | null
-          rank?: number | null
+          streak_rewarded_at?: number | null
+          streak_target?: number | null
+          timezone?: string | null
         }
         Update: {
           active_book_id?: string | null
           active_companion_id?: string | null
           ai_opt_in?: boolean | null
+          app_version?: string | null
+          country_code?: string | null
           current_streak?: number | null
           daily_goal_amount?: number | null
-          daily_goal_unit?: string | null
+          device_os?: string | null
           email?: string | null
-          golden_bookmarks?: number | null
+          golden_bookmarks?: number
           id?: string
           ink_drops?: number | null
           is_premium?: boolean | null
-          last_read_date?: string | null
+          last_session_at?: string | null
           preferred_format?: string | null
-          rank?: number | null
+          streak_rewarded_at?: number | null
+          streak_target?: number | null
+          timezone?: string | null
         }
         Relationships: [
           {

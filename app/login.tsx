@@ -21,7 +21,9 @@ export default function LoginScreen() {
           password,
         });
         if (error) throw error;
-        Alert.alert("Success", "Account created! Please sign in.");
+        Alert.alert("Success", "Account created! Let's set up your reading profile.");
+        setEmail('');
+        setPassword('');
         setIsSignUp(false);
       } else {
         // Sign In
