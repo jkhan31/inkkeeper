@@ -1,36 +1,209 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# InkKeeper
 
-## Getting Started
+A disciplined reading ritual system built as a mobile-first PWA.
 
-First, run the development server:
+InkKeeper is not a productivity tool.  
+It is not a habit tracker.  
+It does not gamify reading.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+It provides a structured, time-bound container for deliberate reading sessions and long-term accumulation.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+---
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Product Philosophy
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Structure creates freedom.  
+Ritual creates consistency.  
+Accumulation creates meaning.
 
-## Learn More
+InkKeeper reduces friction at the moment of starting while protecting calm during the session itself.
 
-To learn more about Next.js, take a look at the following resources:
+There are:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- No streaks
+- No progress bars
+- No achievement systems
+- No urgency cues
+- No social features
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The system reinforces practice, not performance.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Core User Flow
+Dashboard → Setup → Active Session → Log → Return
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+This loop is protected.  
+No feature may interrupt or branch it.
+
+---
+
+## Functional Scope (v0.1)
+
+### Authentication
+- Supabase Magic Link (passwordless)
+- Client-side session persistence
+- Row-level security enforced per user
+
+### Session Lifecycle
+- User selects a fixed duration
+- Timestamp-based timer (start_time / end_time)
+- Pause duration explicitly excluded
+- 5-minute logging guardrail enforced
+- 4-minute subtle continuation nudge
+
+### Practice Tracking
+- Total Sessions
+- Total Minutes
+- Weekly Sessions (rolling 7 days)
+- Weekly Minutes
+
+### Ledger
+- Reverse chronological session history
+- Inline expansion
+- No editing
+- No analytics views
+
+---
+
+## Duration Model
+
+First 3 sessions:
+- 10 / 15 / 20 minutes
+
+After 3 logged sessions:
+- 5–60 minutes in 5-minute increments
+- Opens centered on last selected duration
+
+No unlock messaging.
+
+Expansion is structural, not emotional.
+
+---
+
+## Tech Stack
+
+### Frontend
+- Next.js (App Router)
+- Client Components for session hydration
+- Mobile-first layout
+- Installable PWA
+
+### Backend
+- Supabase
+  - Postgres
+  - Magic Link authentication
+  - Row-level security policies
+
+### Hosting
+- Netlify (Next.js runtime)
+
+### Data Model
+
+**User**
+- id
+- email
+- created_at
+
+**Session**
+- id (uuid)
+- user_id (FK)
+- book_title
+- note
+- start_time
+- end_time
+- duration_minutes
+- created_at
+
+**UserPreferences**
+- user_id
+- last_selected_duration
+
+---
+
+## Timer Integrity
+
+Duration is calculated from timestamps:
+duration = end_time - start_time - paused_duration
+
+The UI counter is not trusted.
+
+Rules:
+
+- <5 minutes → session not saved
+- 4–5 minutes → confirmation required
+- ≥5 minutes → save enabled
+
+Paused time is explicitly excluded from persistence.
+
+---
+
+## Design System Constraints
+
+InkKeeper must feel:
+
+- Disciplined
+- Calm
+- Grounded
+- Cleanly resolved
+
+It must never feel:
+
+- Motivational
+- Competitive
+- Playful
+- Gamified
+- Urgent
+
+Primary color is reserved exclusively for deliberate action (Begin / Save).
+
+Motion is restrained (150–250ms, ease-out, no bounce).
+
+---
+
+## Non-Goals (v0.1)
+
+The following are explicitly excluded:
+
+- Streak tracking
+- Notifications
+- Reminders
+- Editing past sessions
+- Dark mode
+- Charts
+- Goal completion metrics
+- Social features
+
+---
+
+## Definition of v0.1 Complete
+
+- Authentication stable
+- Session persistence reliable
+- Timer mathematically accurate
+- 5-minute guardrail enforced
+- Totals calculated correctly
+- Weekly stats correct
+- History renders accurately
+- PWA installable
+- Personally used for at least 3 sessions
+
+No feature expansion before 4+ weeks of real usage.
+
+---
+
+## Development Philosophy
+
+InkKeeper is built:
+
+- Slowly
+- Deliberately
+- Without deadline pressure
+- With structural integrity prioritized over polish
+
+The documents in `/docs` define system constraints.  
+If implementation conflicts with documentation, documentation wins.
+
+---
+
+InkKeeper is complete when the ritual feels stable — not when it has features.
