@@ -8,7 +8,6 @@ export default function Active() {
 
     const targetDurationMinutes = 0.25 // 15 seconds for testing, actual should default to 15
     const targetSeconds = targetDurationMinutes * 60
-    const targetDurationMs = targetDurationMinutes * 60 * 1000
 
     const minimumSessionSeconds = 5 // 5 seconds for testing, actual should be 5 * 60
 
@@ -53,15 +52,21 @@ export default function Active() {
     }
 
     const handleEnd = () => {
+        // 🔒 Close any active pause before final calculation
+        if (pauseStartRef.current !== null) {
+            pausedDurationRef.current += Date.now() - pauseStartRef.current
+            pauseStartRef.current = null
+        }
+
         if (elapsedSeconds < minimumSessionSeconds) {
-            alert('Minimum session is 5 minutes.')
+            alert(`Minimum session is ${minimumSessionSeconds} seconds while testing. Update code when ready.`)
             return
         }
 
         const sessionData = {
             startTime: startTimeRef.current,
             endTime: Date.now(),
-            durationMinutes: Math.floor(elapsedSeconds / 60)
+            durationMinutes: Math.max(1, Math.floor(elapsedSeconds / 60))
         }
 
         sessionStorage.setItem(
@@ -71,6 +76,7 @@ export default function Active() {
 
         router.push('/session/log')
     }
+
 
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
 
