@@ -14,7 +14,7 @@ export default function Login() {
         const { error } = await supabase.auth.signInWithOtp({
             email,
             options: {
-                emailRedirectTo: 'http://localhost:3000/dashboard'
+                emailRedirectTo: `${window.location.origin}/dashboard`
             }
         })
 
@@ -26,6 +26,7 @@ export default function Login() {
 
         setLoading(false)
     }
+
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FAF5F0] text-[#1A1A1A]">
