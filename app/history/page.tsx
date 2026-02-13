@@ -64,26 +64,51 @@ export default function History() {
   }
 
   // ─────────────────────────────────────────────────────────
+  // Compute lifetime summary metrics
+  // ─────────────────────────────────────────────────────────
+  const totalSessions = sessions.length
+  const totalMinutes = sessions.reduce((sum, session) => sum + (session.duration_minutes || 0), 0)
+
+  // ─────────────────────────────────────────────────────────
   // Render session history
   // ─────────────────────────────────────────────────────────
   return (
-    <main>
+    <main className="flex min-h-screen flex-col items-center gap-8 pt-12 bg-[#FAF5F0] text-[#1A1A1A]">
       <h1>History</h1>
-      
-      {sessions.length === 0 ? (
-        <p>No sessions yet.</p>
-      ) : (
-        <ul>
-          {sessions.map((session) => (
-            <li key={session.id} style={{ marginBottom: '1.5rem' }}>
-              <p>{new Date(session.created_at).toLocaleString()}</p>
-              <p>Duration: {session.duration_minutes} minutes</p>
-              {session.book_title && <p>Book: {session.book_title}</p>}
-              {session.note && <p>Note: {session.note}</p>}
-            </li>
-          ))}
-        </ul>
-      )}
+
+      {/* Lifetime Summary */}
+      <div>
+        <h2 className="text-lg font-semibold mb-3">Your Reading Record</h2>
+        <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+          <div className="bg-white border border-[#E5E5E5] p-4">
+            <div className="text-2xl font-semibold">{totalSessions}</div>
+            <div className="text-sm font-medium">Sessions</div>
+          </div>
+          <div className="bg-white border border-[#E5E5E5] p-4">
+            <div className="text-2xl font-semibold">{totalMinutes}</div>
+            <div className="text-sm font-medium">Minutes</div>
+          </div>
+        </div>
+      </div>
+
+
+      {/* Session List */}
+      <div className="w-full max-w-md">
+        {sessions.length === 0 ? (
+          <p>No sessions yet.</p>
+        ) : (
+          <ul>
+            {sessions.map((session) => (
+              <li key={session.id} style={{ marginBottom: '1.5rem' }}>
+                <p>{new Date(session.created_at).toLocaleString()}</p>
+                <p>Duration: {session.duration_minutes} minutes</p>
+                {session.book_title && <p>Book: {session.book_title}</p>}
+                {session.note && <p>Note: {session.note}</p>}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
 
       <Link href="/dashboard">
         <button>Back</button>
