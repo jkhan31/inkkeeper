@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation'
 export default function Active() {
     const router = useRouter()
 
-    const targetDurationMinutes = 0.25 // 15 seconds for testing
+    const targetDurationMinutes = 0.25 // 15 seconds for testing, actual should default to 15
     const targetSeconds = targetDurationMinutes * 60
     const targetDurationMs = targetDurationMinutes * 60 * 1000
 
-    const minimumSessionSeconds = 5  // 5 seconds for testing, actual should be 5 * 60
+    const minimumSessionSeconds = 5 // 5 seconds for testing, actual should be 5 * 60
 
     const startTimeRef = useRef<number>(Date.now())
     const pausedDurationRef = useRef<number>(0)
@@ -18,7 +18,6 @@ export default function Active() {
     
     const [elapsedTime, setElapsedTime] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
-    const [errorMessage, setErrorMessage] = useState('')
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -54,14 +53,23 @@ export default function Active() {
     }
 
     const handleEnd = () => {
-        const elapsedSeconds = Math.floor(elapsedTime / 1000)
-        
         if (elapsedSeconds < minimumSessionSeconds) {
-            setErrorMessage('Minimum session is 5 minutes.')
+            alert('Minimum session is 5 minutes.')
             return
         }
-        
-        router.push('/dashboard')
+
+        const sessionData = {
+            startTime: startTimeRef.current,
+            endTime: Date.now(),
+            durationMinutes: Math.floor(elapsedSeconds / 60)
+        }
+
+        sessionStorage.setItem(
+            'inkkeeper_active_session',
+            JSON.stringify(sessionData)
+        )
+
+        router.push('/session/log')
     }
 
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
@@ -78,7 +86,6 @@ export default function Active() {
         <main>
             <h1>Active Session</h1>
             <div>{formatTime(displaySeconds)}</div>
-            {errorMessage && <div>{errorMessage}</div>}
             <button onClick={handlePauseResume}>
                 {isPaused ? 'Resume' : 'Pause'}
             </button>
