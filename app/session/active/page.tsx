@@ -10,12 +10,15 @@ export default function Active() {
     const targetSeconds = targetDurationMinutes * 60
     const targetDurationMs = targetDurationMinutes * 60 * 1000
 
+    const minimumSessionSeconds = 5  // 5 seconds for testing, actual should be 5 * 60
+
     const startTimeRef = useRef<number>(Date.now())
     const pausedDurationRef = useRef<number>(0)
     const pauseStartRef = useRef<number | null>(null)
     
     const [elapsedTime, setElapsedTime] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
+    const [errorMessage, setErrorMessage] = useState('')
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -51,6 +54,13 @@ export default function Active() {
     }
 
     const handleEnd = () => {
+        const elapsedSeconds = Math.floor(elapsedTime / 1000)
+        
+        if (elapsedSeconds < minimumSessionSeconds) {
+            setErrorMessage('Minimum session is 5 minutes.')
+            return
+        }
+        
         router.push('/dashboard')
     }
 
@@ -68,6 +78,7 @@ export default function Active() {
         <main>
             <h1>Active Session</h1>
             <div>{formatTime(displaySeconds)}</div>
+            {errorMessage && <div>{errorMessage}</div>}
             <button onClick={handlePauseResume}>
                 {isPaused ? 'Resume' : 'Pause'}
             </button>
