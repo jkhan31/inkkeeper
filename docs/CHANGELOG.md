@@ -1,0 +1,40 @@
+# InkKeeper — Change Log
+
+All notable changes to this project are documented here.
+
+Versioning is milestone-based and aligned with architectural phases.
+
+---
+
+## [v0.1-in-progress] — 2026-02-13
+
+### Added
+- Supabase Magic Link authentication
+- Row-Level Security (RLS) policies enforcing per-user isolation
+- Sacred loop routing:
+  - /login
+  - /dashboard
+  - /session/setup
+  - /session/active
+  - /session/log
+  - /history
+- Timestamp-based ritual timer (start_time / end_time)
+- Pause duration exclusion from persisted duration
+- 5-minute logging guardrail
+- Session persistence to `sessions` table
+- Reverse chronological history ledger
+
+### Changed
+- Removed development auth bypass to ensure production-parity authentication behavior
+
+### Security
+- Insert policy enforced: `auth.uid() = user_id`
+- Select policy enforced: `auth.uid() = user_id`
+- Update and delete operations intentionally not permitted
+
+### Notes
+- Dashboard aggregation metrics not yet implemented
+- Duration progression system not yet implemented
+- Duration memory not yet implemented
+- Inline history expansion not yet implemented
+- 4-minute guardrail confirmation not yet implemented
