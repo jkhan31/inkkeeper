@@ -10,23 +10,20 @@ export default function Dashboard() {
 
     useEffect(() => {
         const checkSession = async () => {
-            // DEV BYPASS
-            if (process.env.NEXT_PUBLIC_DEV_BYPASS === 'true') {
-                setUser({ email: 'dev@local.test' })
-                return
-            }
+            const { data, error } = await supabase.auth.getSession()
+            console.log('DASHBOARD SESSION:', data, error)
 
-            const { data: { session } } = await supabase.auth.getSession()
-
-            if (!session) {
+            if (!data.session) {
                 router.replace('/login')
             } else {
-                setUser(session.user)
+                setUser(data.session.user)
             }
         }
 
         checkSession()
     }, [router])
+
+
 
 
 
