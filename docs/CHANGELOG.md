@@ -23,6 +23,9 @@ Versioning is milestone-based and aligned with architectural phases.
 - 5-minute logging guardrail
 - Session persistence to `sessions` table
 - Reverse chronological history ledger
+- Scroll-based duration selector with snap behavior
+- First-3-session duration restriction (10, 15, 20)
+- Expanded duration range unlocked at 3 sessions
 
 ### Changed
 - Removed development auth bypass to ensure production-parity authentication behavior
