@@ -97,16 +97,16 @@ export default function History() {
         {sessions.length === 0 ? (
           <p>No sessions yet.</p>
         ) : (
-          <ul>
+          <div className="flex flex-col gap-4">
             {sessions.map((session) => (
-              <li key={session.id} style={{ marginBottom: '1.5rem' }}>
+              <div key={session.id} className="bg-white border border-[#E5E5E5] p-4">
                 <p>{new Date(session.created_at).toLocaleString()}</p>
                 <p>Duration: {session.duration_minutes} minutes</p>
                 {session.book_title && <p>Book: {session.book_title}</p>}
                 {session.note && <p>Note: {session.note}</p>}
-              </li>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
 

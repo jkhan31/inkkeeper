@@ -82,46 +82,54 @@ export default function Dashboard() {
     if (!user) return null
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#FAF5F0] text-[#1A1A1A]">
-            <h1>Welcome, {user.email}</h1>
+        <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A] pt-8">
+            {/* Header - left aligned */}
+            <header className="px-8 mb-8">
+                <h2 className="text-2xl">InkKeeper</h2>
+            </header>
 
-            {/* Weekly Metrics Summary */}
-            <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-                <div className="bg-white border border-[#E5E5E5] p-4">
-                    <div className="text-2xl font-semibold">{weeklySessionCount}</div>
-                    <div className="text-sm font-medium">Sessions</div>
-                    <div className="text-xs opacity-60 mt-1">this week</div>
+            {/* Main content - centered */}
+            <div className="flex flex-col items-center gap-6 w-full max-w-md mx-auto">
+                <h1>Welcome, {user.email}</h1>
+
+                {/* Weekly Metrics Summary */}
+                <div className="grid grid-cols-2 gap-4 w-full">
+                    <div className="bg-white border border-[#E5E5E5] p-4">
+                        <div className="text-2xl font-semibold">{weeklySessionCount}</div>
+                        <div className="text-sm font-medium">Sessions</div>
+                        <div className="text-xs opacity-60 mt-1">this week</div>
+                    </div>
+                    <div className="bg-white border border-[#E5E5E5] p-4">
+                        <div className="text-2xl font-semibold">{weeklyMinutesTotal}</div>
+                        <div className="text-sm font-medium">Minutes</div>
+                        <div className="text-xs opacity-60 mt-1">this week</div>
+                    </div>
                 </div>
-                <div className="bg-white border border-[#E5E5E5] p-4">
-                    <div className="text-2xl font-semibold">{weeklyMinutesTotal}</div>
-                    <div className="text-sm font-medium">Minutes</div>
-                    <div className="text-xs opacity-60 mt-1">this week</div>
-                </div>
+
+                {/* Primary Action: Session Creation */}
+                <button
+                    onClick={() => router.push('/session/setup')}
+                    className="bg-[#3F5A4A] text-white px-6 py-3"
+                >
+                    Begin Session
+                </button>
+
+                {/* Secondary Action: Review Past Sessions */}
+                <button
+                    onClick={() => router.push('/history')}
+                    className="border border-[#1A1A1A] px-6 py-3"
+                >
+                    View History
+                </button>
+
+                {/* Tertiary Action: Account Management */}
+                <button
+                    onClick={handleLogout}
+                    className="text-sm opacity-60"
+                >
+                    Logout
+                </button>
             </div>
-
-            {/* Primary Action: Session Creation */}
-            <button
-                onClick={() => router.push('/session/setup')}
-                className="bg-[#3F5A4A] text-white px-6 py-3"
-            >
-                Begin Session
-            </button>
-
-            {/* Secondary Action: Review Past Sessions */}
-            <button
-                onClick={() => router.push('/history')}
-                className="border border-[#1A1A1A] px-6 py-3"
-            >
-                View History
-            </button>
-
-            {/* Tertiary Action: Account Management */}
-            <button
-                onClick={handleLogout}
-                className="text-sm opacity-60"
-            >
-                Logout
-            </button>
         </main>
     )
 
