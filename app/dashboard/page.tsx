@@ -4,10 +4,18 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 
+/**
+ * Dashboard: Main landing page after authentication
+ * 
+ * Serves as the central hub for navigating to session creation and history.
+ * Implements auth gate pattern - redirects to login if no active session.
+ */
 export default function Dashboard() {
     const [user, setUser] = useState<any>(null)
     const router = useRouter()
 
+    // Auth Gate: Verify session exists before rendering dashboard
+    // Uses replace() to prevent back-navigation to this page when logged out
     useEffect(() => {
         const checkSession = async () => {
             const { data, error } = await supabase.auth.getSession()
@@ -22,17 +30,20 @@ export default function Dashboard() {
         checkSession()
     }, [router])
 
+    // Logout Flow: Clear Supabase session and return to login
     const handleLogout = async () => {
         await supabase.auth.signOut()
         router.push('/login')
     }
 
+    // Prevent flash of content while auth check completes
     if (!user) return null
 
     return (
         <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#FAF5F0] text-[#1A1A1A]">
             <h1>Welcome, {user.email}</h1>
 
+            {/* Primary Action: Session Creation */}
             <button
                 onClick={() => router.push('/session/setup')}
                 className="bg-[#3F5A4A] text-white px-6 py-3"
@@ -40,6 +51,7 @@ export default function Dashboard() {
                 Begin Session
             </button>
 
+            {/* Secondary Action: Review Past Sessions */}
             <button
                 onClick={() => router.push('/history')}
                 className="border border-[#1A1A1A] px-6 py-3"
@@ -47,6 +59,7 @@ export default function Dashboard() {
                 View History
             </button>
 
+            {/* Tertiary Action: Account Management */}
             <button
                 onClick={handleLogout}
                 className="text-sm opacity-60"

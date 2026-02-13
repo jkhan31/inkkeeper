@@ -1,3 +1,10 @@
+/**
+ * History Page
+ * 
+ * Displays a read-only chronological list of the user's completed reading sessions.
+ * Authentication-gated: redirects to login if user is not authenticated.
+ */
+
 'use client'
 
 import { useEffect, useState } from 'react'
@@ -5,6 +12,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
 
+// Session shape mirrors the Supabase sessions table structure
 interface Session {
   id: string
   created_at: string
@@ -20,7 +28,10 @@ export default function History() {
 
   useEffect(() => {
     const fetchData = async () => {
-      // Check authentication
+      // ─────────────────────────────────────────────────────────
+      // Authentication check
+      // ─────────────────────────────────────────────────────────
+      // Verify user session before loading data to prevent unauthorized access
       const { data: { user }, error: authError } = await supabase.auth.getUser()
       
       if (authError || !user) {
@@ -28,7 +39,10 @@ export default function History() {
         return
       }
 
-      // Fetch sessions
+      // ─────────────────────────────────────────────────────────
+      // Fetch all sessions
+      // ─────────────────────────────────────────────────────────
+      // Ordered newest-first to show most recent reading activity at the top
       const { data, error } = await supabase
         .from('sessions')
         .select('*')
@@ -44,10 +58,14 @@ export default function History() {
     fetchData()
   }, [router])
 
+  // Prevent flash of empty state while authentication and data load
   if (loading) {
     return <main><p>Loading...</p></main>
   }
 
+  // ─────────────────────────────────────────────────────────
+  // Render session history
+  // ─────────────────────────────────────────────────────────
   return (
     <main>
       <h1>History</h1>

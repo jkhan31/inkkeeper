@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
+// Temporary format for session data passed through sessionStorage
+// after user ends a session in /session/active
 interface SessionData {
     startTime: number
     endTime: number
@@ -15,6 +17,11 @@ export default function Log() {
     const router = useRouter()
     const [sessionData, setSessionData] = useState<SessionData | null>(null)
 
+    // ═══════════════════════════════════════════════════════════
+    // Load session from sessionStorage
+    // ═══════════════════════════════════════════════════════════
+    // Session data arrives here via sessionStorage after redirect from /session/active
+    // If missing, user arrived incorrectly — redirect back to dashboard
     useEffect(() => {
         const storedSession = sessionStorage.getItem('inkkeeper_active_session')
         
@@ -33,6 +40,7 @@ export default function Log() {
         }
     }, [router])
 
+    // Guard: wait for session data to load
     if (!sessionData) {
         return <div>Loading...</div>
     }
@@ -41,6 +49,12 @@ export default function Log() {
         return new Date(timestamp).toLocaleString()
     }
 
+    // ═══════════════════════════════════════════════════════════
+    // Persist session to Supabase
+    // ═══════════════════════════════════════════════════════════
+    // RLS ensures user_id is enforced at database level
+    // sessionStorage is cleared only after successful insert (data safety)
+    // router.replace used to prevent back-navigation to this page
     const handleSave = async () => {
 
         if (!sessionData) return
@@ -72,10 +86,10 @@ export default function Log() {
                 return
             }
 
-            // Clear sessionStorage only after successful insert
+            // Clean up temporary storage after successful persist
             sessionStorage.removeItem('inkkeeper_active_session')
             
-            // Redirect to dashboard
+            // Use replace to prevent back-navigation to this page
             router.replace('/dashboard')
         } catch (error) {
             console.error('Unexpected error saving session:', error)

@@ -3,13 +3,24 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 
+/**
+ * Active Session Page
+ * 
+ * Runs a reading timer that counts down from a target duration,
+ * then continues counting up if the session goes beyond the target.
+ * Supports pause/resume to exclude breaks during a reading session.
+ */
 export default function Active() {
     const router = useRouter()
+
+    // ─── Session Configuration ────────────────────────────────────────────────
 
     const targetDurationMinutes = 0.25 // 15 seconds for testing, actual should default to 15
     const targetSeconds = targetDurationMinutes * 60
 
     const minimumSessionSeconds = 5 // 5 seconds for testing, actual should be 5 * 60
+
+    // ─── Time Tracking (refs to avoid re-render on every calculation) ─────────
 
     const startTimeRef = useRef<number>(Date.now())
     const pausedDurationRef = useRef<number>(0)
@@ -18,8 +29,11 @@ export default function Active() {
     const [elapsedTime, setElapsedTime] = useState(0)
     const [isPaused, setIsPaused] = useState(false)
 
+    // ─── Timer Loop ───────────────────────────────────────────────────────────
+
     useEffect(() => {
         const interval = setInterval(() => {
+            // Only update elapsed time when not paused
             if (pauseStartRef.current === null) {
                 setElapsedTime(Date.now() - startTimeRef.current - pausedDurationRef.current)
             }
@@ -28,6 +42,8 @@ export default function Active() {
         return () => clearInterval(interval)
     }, [])
 
+    // ─── Utilities ────────────────────────────────────────────────────────────
+
     const formatTime = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60)
         const seconds = totalSeconds % 60
@@ -35,6 +51,9 @@ export default function Active() {
             .toString()
             .padStart(2, '0')}`
     }
+
+    // ─── Pause & Resume ───────────────────────────────────────────────────────
+    // Tracks paused duration separately to exclude break time from billable hours
 
     const handlePauseResume = () => {
         if (isPaused) {
@@ -51,8 +70,11 @@ export default function Active() {
         }
     }
 
+    // ─── End Session ──────────────────────────────────────────────────────────
+    // Finalizes the session, enforces minimum duration, stores to sessionStorage
+
     const handleEnd = () => {
-        // 🔒 Close any active pause before final calculation
+        // Close any active pause before final calculation
         if (pauseStartRef.current !== null) {
             pausedDurationRef.current += Date.now() - pauseStartRef.current
             pauseStartRef.current = null
@@ -77,6 +99,8 @@ export default function Active() {
         router.push('/session/log')
     }
 
+    // ─── Display Logic ────────────────────────────────────────────────────────
+    // Countdown to target duration, then switch to count-up for overrun
 
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
 
