@@ -11,7 +11,6 @@ export default function Dashboard() {
     useEffect(() => {
         const checkSession = async () => {
             const { data, error } = await supabase.auth.getSession()
-            console.log('DASHBOARD SESSION:', data, error)
 
             if (!data.session) {
                 router.replace('/login')
@@ -22,10 +21,6 @@ export default function Dashboard() {
 
         checkSession()
     }, [router])
-
-
-
-
 
     const handleLogout = async () => {
         await supabase.auth.signOut()
