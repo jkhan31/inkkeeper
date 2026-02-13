@@ -12,7 +12,48 @@ import { useRouter } from 'next/navigation'
  */
 export default function Dashboard() {
     const [user, setUser] = useState<any>(null)
+    const [weeklySessionCount, setWeeklySessionCount] = useState<number>(0)
+    const [weeklyMinutesTotal, setWeeklyMinutesTotal] = useState<number>(0)
     const router = useRouter()
+
+    // Helper: Get start and end of current week (Monday-Sunday)
+    const getWeekBounds = () => {
+        const now = new Date()
+        const dayOfWeek = now.getDay()
+        const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek // Monday = 1, Sunday = 0
+        
+        const monday = new Date(now)
+        monday.setDate(now.getDate() + diff)
+        monday.setHours(0, 0, 0, 0)
+        
+        const sunday = new Date(monday)
+        sunday.setDate(monday.getDate() + 6)
+        sunday.setHours(23, 59, 59, 999)
+        
+        return { start: monday, end: sunday }
+    }
+
+    // Fetch weekly metrics from sessions table
+    const fetchWeeklyMetrics = async () => {
+        const { start, end } = getWeekBounds()
+        
+        const { data, error } = await supabase
+            .from('sessions')
+            .select('id, duration_minutes, created_at')
+            .gte('created_at', start.toISOString())
+            .lte('created_at', end.toISOString())
+        
+        if (error) {
+            console.error('Error fetching sessions:', error)
+            return
+        }
+        
+        if (data) {
+            setWeeklySessionCount(data.length)
+            const totalMinutes = data.reduce((sum, session) => sum + (session.duration_minutes || 0), 0)
+            setWeeklyMinutesTotal(totalMinutes)
+        }
+    }
 
     // Auth Gate: Verify session exists before rendering dashboard
     // Uses replace() to prevent back-navigation to this page when logged out
@@ -24,6 +65,7 @@ export default function Dashboard() {
                 router.replace('/login')
             } else {
                 setUser(data.session.user)
+                await fetchWeeklyMetrics()
             }
         }
 
@@ -42,6 +84,20 @@ export default function Dashboard() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-center gap-6 bg-[#FAF5F0] text-[#1A1A1A]">
             <h1>Welcome, {user.email}</h1>
+
+            {/* Weekly Metrics Summary */}
+            <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+                <div className="bg-white border border-[#E5E5E5] p-4">
+                    <div className="text-2xl font-semibold">{weeklySessionCount}</div>
+                    <div className="text-sm font-medium">Sessions</div>
+                    <div className="text-xs opacity-60 mt-1">this week</div>
+                </div>
+                <div className="bg-white border border-[#E5E5E5] p-4">
+                    <div className="text-2xl font-semibold">{weeklyMinutesTotal}</div>
+                    <div className="text-sm font-medium">Minutes</div>
+                    <div className="text-xs opacity-60 mt-1">this week</div>
+                </div>
+            </div>
 
             {/* Primary Action: Session Creation */}
             <button
