@@ -24,6 +24,10 @@ export default function Setup() {
 
     const isRestricted = totalSessions < 3
 
+    const durations = isRestricted 
+        ? [10, 15, 20]
+        : Array.from({ length: 60 / 5 }, (_, i) => (i + 1) * 5)
+
     return (
         <main>
             <h1>Session Setup</h1>
