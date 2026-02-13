@@ -6,6 +6,10 @@ import { useRouter } from 'next/navigation'
 export default function Active() {
     const router = useRouter()
 
+    const targetDurationMinutes = 0.25 // 15 seconds for testing
+    const targetSeconds = targetDurationMinutes * 60
+    const targetDurationMs = targetDurationMinutes * 60 * 1000
+
     const startTimeRef = useRef<number>(Date.now())
     const pausedDurationRef = useRef<number>(0)
     const pauseStartRef = useRef<number | null>(null)
@@ -23,8 +27,7 @@ export default function Active() {
         return () => clearInterval(interval)
     }, [])
 
-    const formatTime = (milliseconds: number) => {
-        const totalSeconds = Math.floor(milliseconds / 1000)
+    const formatTime = (totalSeconds: number) => {
         const minutes = Math.floor(totalSeconds / 60)
         const seconds = totalSeconds % 60
         return `${minutes.toString().padStart(2, '0')}:${seconds
@@ -51,10 +54,20 @@ export default function Active() {
         router.push('/dashboard')
     }
 
+    const elapsedSeconds = Math.floor(elapsedTime / 1000)
+
+    let displaySeconds: number
+
+    if (elapsedSeconds < targetSeconds) {
+        displaySeconds = targetSeconds - elapsedSeconds
+    } else {
+        displaySeconds = elapsedSeconds
+    }
+
     return (
         <main>
             <h1>Active Session</h1>
-            <div>{formatTime(elapsedTime)}</div>
+            <div>{formatTime(displaySeconds)}</div>
             <button onClick={handlePauseResume}>
                 {isPaused ? 'Resume' : 'Pause'}
             </button>
