@@ -3,8 +3,12 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
+import { useRouter } from 'next/navigation'
 
 export default function Setup() {
+    const router = useRouter()
+
+    // ─── Session Duration Selection ────────────────────────────────────────────
     const [totalSessions, setTotalSessions] = useState<number>(0)
     const [selectedDuration, setSelectedDuration] = useState<number>(15)
     const scrollContainerRef = useRef<HTMLDivElement>(null)
@@ -77,6 +81,16 @@ export default function Setup() {
         setSelectedDuration(durations[index])
     }
 
+    const handleConfirm = () => {
+        sessionStorage.setItem(
+            'inkkeeper_selected_duration',
+            selectedDuration.toString()
+        )
+
+        router.push('/session/active')
+    }
+
+
     return (
         <main className="flex flex-col items-center justify-center min-h-screen p-4">
             <h1 className="text-2xl font-bold mb-8">Session Setup</h1>
@@ -111,11 +125,14 @@ export default function Setup() {
             </div>
 
             <div className="mt-8 flex gap-4">
-                <Link href="/session/active">
-                    <button className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Confirm Duration
-                    </button>
-                </Link>
+                <button
+                    onClick={handleConfirm}
+                    className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                >
+                    Confirm Duration
+                </button>
+
+
 
                 <Link href="/dashboard">
                     <button className="px-6 py-2 bg-gray-400 text-white rounded hover:bg-gray-500">

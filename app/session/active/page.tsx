@@ -15,7 +15,11 @@ export default function Active() {
 
     // ─── Session Configuration ────────────────────────────────────────────────
 
-    const targetDurationMinutes = 0.25 // 15 seconds for testing, actual should default to 15
+    const [targetDurationMinutes] = useState(() => {
+        if (typeof window === 'undefined') return 15
+        const stored = sessionStorage.getItem('inkkeeper_selected_duration')
+        return stored ? Number(stored) : 15
+    })
     const targetSeconds = targetDurationMinutes * 60
 
     const minimumSessionSeconds = 5 // 5 seconds for testing, actual should be 5 * 60
