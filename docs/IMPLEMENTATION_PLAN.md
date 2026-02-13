@@ -1,5 +1,23 @@
 # InkKeeper — Implementation Plan
 
+## Current Status (2026-02-13)
+
+Completed:
+- Phase 0 — Setup
+- Phase 1 — Core Loop Skeleton
+- Phase 2 — Timer Integrity
+- Phase 3 — Persistence (Insert)
+- Phase 4 — History (Basic List)
+
+Pending to honor original v0.1 definition:
+- Dashboard totals (Total + Weekly)
+- Duration progression system
+- Duration memory (UserPreferences)
+- 4-minute subtle nudge
+- Inline history expansion
+- Visual system enforcement
+- PWA install verification
+
 ## Build Philosophy
 
 - Protect the sacred loop first.
