@@ -7,11 +7,17 @@ export default function Active() {
     const router = useRouter()
 
     const startTimeRef = useRef<number>(Date.now())
+    const pausedDurationRef = useRef<number>(0)
+    const pauseStartRef = useRef<number | null>(null)
+    
     const [elapsedTime, setElapsedTime] = useState(0)
+    const [isPaused, setIsPaused] = useState(false)
 
     useEffect(() => {
         const interval = setInterval(() => {
-            setElapsedTime(Date.now() - startTimeRef.current)
+            if (pauseStartRef.current === null) {
+                setElapsedTime(Date.now() - startTimeRef.current - pausedDurationRef.current)
+            }
         }, 1000)
 
         return () => clearInterval(interval)
@@ -26,6 +32,21 @@ export default function Active() {
             .padStart(2, '0')}`
     }
 
+    const handlePauseResume = () => {
+        if (isPaused) {
+            // Resume
+            if (pauseStartRef.current !== null) {
+                pausedDurationRef.current += Date.now() - pauseStartRef.current
+                pauseStartRef.current = null
+            }
+            setIsPaused(false)
+        } else {
+            // Pause
+            pauseStartRef.current = Date.now()
+            setIsPaused(true)
+        }
+    }
+
     const handleEnd = () => {
         router.push('/dashboard')
     }
@@ -34,6 +55,9 @@ export default function Active() {
         <main>
             <h1>Active Session</h1>
             <div>{formatTime(elapsedTime)}</div>
+            <button onClick={handlePauseResume}>
+                {isPaused ? 'Resume' : 'Pause'}
+            </button>
             <button onClick={handleEnd}>End</button>
         </main>
     )
