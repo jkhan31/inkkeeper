@@ -178,13 +178,21 @@ export default function Dashboard() {
                     </div>
                 )}
 
-                {/* Logout */}
-                <button
-                    onClick={handleLogout}
-                    className="text-sm opacity-60 hover:opacity-100 mt-4"
-                >
-                    Logout
-                </button>
+                {/* Account Actions */}
+                <div className="flex gap-4 mt-4">
+                    <button
+                        onClick={() => router.push('/set-password')}
+                        className="text-sm opacity-60 hover:opacity-100"
+                    >
+                        Change Password
+                    </button>
+                    <button
+                        onClick={handleLogout}
+                        className="text-sm opacity-60 hover:opacity-100"
+                    >
+                        Logout
+                    </button>
+                </div>
             </div>
         </main>
     )

@@ -16,7 +16,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
   const { data: { user }, error: userError } = await supabase.auth.getUser();
   
   if (userError || !user) {
-    notFound();
+    return <div>No authenticated user</div>;
   }
 
   // Fetch session
@@ -28,7 +28,7 @@ export default async function SessionDetailPage({ params }: PageProps) {
     .single();
 
   if (sessionError || !session) {
-    notFound();
+    return <div>Session not found</div>;
   }
 
   // Format date like SessionCard: "18 Jan 2026"
