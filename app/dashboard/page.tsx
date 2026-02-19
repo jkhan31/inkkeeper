@@ -142,7 +142,7 @@ export default function Dashboard() {
     return (
         <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A] pt-8 pb-16">
             {/* Header - left aligned */}
-            <header className="px-8 mb-8">
+            <header className="w-full max-w-md mx-auto px-8 mb-8">
                 <h2 className="text-2xl">InkKeeper</h2>
             </header>
 
