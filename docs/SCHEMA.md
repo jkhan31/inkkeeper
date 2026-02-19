@@ -1,6 +1,6 @@
 # InkKeeper — Supabase Schema
 
-Last Updated: 2026-02-13
+Last Updated: 2026-02-19
 
 Database: Supabase (Postgres)  
 Schema: `public`
@@ -26,8 +26,9 @@ Stores individual reading sessions per authenticated user.
 | `start_time` | `timestamptz` | Yes | — | Session start timestamp |
 | `end_time` | `timestamptz` | Yes | — | Session end timestamp |
 | `duration_minutes` | `integer` | Yes | — | Must be `>= 0` |
-| `book_title` | `text` | No | — | Optional book title |
-| `note` | `text` | No | — | Optional reflection text |
+| `book_title` | `text` | Yes | — | Title of book being read |
+| `main_reflection` | `text` | Yes | — | Primary reflection text |
+| `additional_notes` | `text` | No | — | Optional additional notes |
 | `created_at` | `timestamptz` | Yes | `now()` | Record creation time |
 
 ---
@@ -73,8 +74,9 @@ CREATE TABLE public.sessions (
   start_time timestamptz NOT NULL,
   end_time timestamptz NOT NULL,
   duration_minutes integer NOT NULL CHECK (duration_minutes >= 0),
-  book_title text,
-  note text,
+  book_title text NOT NULL,
+  main_reflection text NOT NULL,
+  additional_notes text,
   created_at timestamptz NOT NULL DEFAULT now(),
   CONSTRAINT sessions_pkey PRIMARY KEY (id),
   CONSTRAINT sessions_user_id_fkey

@@ -10,10 +10,21 @@ import { useRouter } from 'next/navigation'
  * Serves as the central hub for navigating to session creation and history.
  * Implements auth gate pattern - redirects to login if no active session.
  */
+
+// Session interface matching the Supabase sessions table
+interface Session {
+    id: string
+    created_at: string
+    duration_minutes: number
+    book_title: string
+    main_reflection: string
+}
+
 export default function Dashboard() {
     const [user, setUser] = useState<any>(null)
     const [weeklySessionCount, setWeeklySessionCount] = useState<number>(0)
     const [weeklyMinutesTotal, setWeeklyMinutesTotal] = useState<number>(0)
+    const [recentSessions, setRecentSessions] = useState<Session[]>([])
     const router = useRouter()
 
     // Helper: Get start and end of current week (Monday-Sunday)
@@ -55,6 +66,24 @@ export default function Dashboard() {
         }
     }
 
+    // Fetch 3 most recent sessions for preview
+    const fetchRecentSessions = async () => {
+        const { data, error } = await supabase
+            .from('sessions')
+            .select('id, created_at, duration_minutes, book_title, main_reflection')
+            .order('created_at', { ascending: false })
+            .limit(3)
+        
+        if (error) {
+            console.error('Error fetching recent sessions:', error)
+            return
+        }
+        
+        if (data) {
+            setRecentSessions(data)
+        }
+    }
+
     // Auth Gate: Verify session exists before rendering dashboard
     // Uses replace() to prevent back-navigation to this page when logged out
     useEffect(() => {
@@ -66,6 +95,7 @@ export default function Dashboard() {
             } else {
                 setUser(data.session.user)
                 await fetchWeeklyMetrics()
+                await fetchRecentSessions()
             }
         }
 
@@ -78,54 +108,108 @@ export default function Dashboard() {
         router.push('/login')
     }
 
+    // Format date helper
+    const formatDate = (dateString: string) => {
+        return new Date(dateString).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        })
+    }
+
+    // Truncate text with ellipsis
+    const truncateText = (text: string, maxLength: number = 120) => {
+        if (text.length <= maxLength) return text
+        return text.slice(0, maxLength).trim() + '...'
+    }
+
+    // Format minutes to hours and minutes
+    const formatTime = (minutes: number) => {
+        if (minutes < 60) {
+            return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`
+        }
+        const hours = Math.floor(minutes / 60)
+        const remainingMinutes = minutes % 60
+        if (remainingMinutes === 0) {
+            return `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+        }
+        return `${hours} ${hours === 1 ? 'hour' : 'hours'} ${remainingMinutes} ${remainingMinutes === 1 ? 'minute' : 'minutes'}`
+    }
+
     // Prevent flash of content while auth check completes
     if (!user) return null
 
     return (
-        <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A] pt-8">
+        <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A] pt-8 pb-16">
             {/* Header - left aligned */}
             <header className="px-8 mb-8">
                 <h2 className="text-2xl">InkKeeper</h2>
             </header>
 
             {/* Main content - centered */}
-            <div className="flex flex-col items-center gap-6 w-full max-w-md mx-auto">
-                <h1>Welcome, {user.email}</h1>
-
+            <div className="flex flex-col items-center gap-8 w-full max-w-md mx-auto px-8">
+                
                 {/* Weekly Metrics Summary */}
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="w-full">
+                    <h3 className="text-sm font-medium mb-3 opacity-60">This Week</h3>
                     <div className="bg-white border border-[#E5E5E5] p-4">
-                        <div className="text-2xl font-semibold">{weeklySessionCount}</div>
-                        <div className="text-sm font-medium">Sessions</div>
-                        <div className="text-xs opacity-60 mt-1">this week</div>
-                    </div>
-                    <div className="bg-white border border-[#E5E5E5] p-4">
-                        <div className="text-2xl font-semibold">{weeklyMinutesTotal}</div>
-                        <div className="text-sm font-medium">Minutes</div>
-                        <div className="text-xs opacity-60 mt-1">this week</div>
+                        <div className="grid grid-cols-2 gap-8">
+                            <div className="text-left">
+                                <div className="text-sm font-medium">{weeklySessionCount} {weeklySessionCount === 1 ? 'session' : 'sessions'}</div>
+                            </div>
+                            <div className="text-left">
+                                <div className="text-sm font-medium">{formatTime(weeklyMinutesTotal)}</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
-                {/* Primary Action: Session Creation */}
+                {/* Primary Action: Start Session */}
                 <button
                     onClick={() => router.push('/session/timer')}
-                    className="bg-[#3F5A4A] text-white px-6 py-3"
+                    className="w-full bg-[#3F5A4A] text-white px-6 py-4 text-lg font-medium hover:bg-[#2F4A3A] transition-colors"
                 >
-                    Begin Session
+                    Start Session
                 </button>
 
-                {/* Secondary Action: Review Past Sessions */}
-                <button
-                    onClick={() => router.push('/history')}
-                    className="border border-[#1A1A1A] px-6 py-3"
-                >
-                    View History
-                </button>
+                {/* Recent Sessions */}
+                {recentSessions.length > 0 && (
+                    <div className="w-full">
+                        <div className="flex justify-between items-center mb-3">
+                            <h3 className="text-sm font-medium opacity-60">Recent Sessions</h3>
+                            <button
+                                onClick={() => router.push('/history')}
+                                className="text-xs opacity-60 hover:opacity-100 underline"
+                            >
+                                View All
+                            </button>
+                        </div>
+                        <div className="flex flex-col gap-3">
+                            {recentSessions.map((session) => (
+                                <div 
+                                    key={session.id} 
+                                    className="bg-white border border-[#E5E5E5] p-4 cursor-pointer hover:border-[#3F5A4A] transition-colors"
+                                    onClick={() => router.push('/history')}
+                                >
+                                    <div className="text-xs opacity-60 mb-2">
+                                        {formatDate(session.created_at)}
+                                    </div>
+                                    <div className="font-medium mb-2">
+                                        {session.book_title}
+                                    </div>
+                                    <div className="text-sm opacity-80 leading-relaxed">
+                                        {truncateText(session.main_reflection)}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
 
-                {/* Tertiary Action: Account Management */}
+                {/* Logout */}
                 <button
                     onClick={handleLogout}
-                    className="text-sm opacity-60"
+                    className="text-sm opacity-60 hover:opacity-100 mt-4"
                 >
                     Logout
                 </button>
