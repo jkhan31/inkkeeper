@@ -5,8 +5,8 @@
 /login  
 /dashboard  
 /session/setup  
-/session/active  
-/session/log  
+/session/timer  
+/session/reflection  
 /history  
 
 ---
@@ -22,10 +22,10 @@ Practice overview + entry point.
 /session/setup  
 Select duration deliberately.
 
-/session/active  
+/session/timer  
 Focused reading container.
 
-/session/log  
+/session/reflection  
 Record book + optional reflection.
 
 /history  

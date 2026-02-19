@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '@/lib/supabaseClient'
 
 // Temporary format for session data passed through sessionStorage
-// after user ends a session in /session/active
+// after user ends a session in /session/timer
 interface SessionData {
     startTime: number
     endTime: number
@@ -20,7 +20,7 @@ export default function Log() {
     // ═══════════════════════════════════════════════════════════
     // Load session from sessionStorage
     // ═══════════════════════════════════════════════════════════
-    // Session data arrives here via sessionStorage after redirect from /session/active
+    // Session data arrives here via sessionStorage after redirect from /session/timer
     // If missing, user arrived incorrectly — redirect back to dashboard
     useEffect(() => {
         const storedSession = sessionStorage.getItem('inkkeeper_active_session')

@@ -15,8 +15,8 @@ Versioning is milestone-based and aligned with architectural phases.
   - /login
   - /dashboard
   - /session/setup
-  - /session/active
-  - /session/log
+  - /session/timer
+  - /session/reflection
   - /history
 - Timestamp-based ritual timer (start_time / end_time)
 - Pause duration exclusion from persisted duration
