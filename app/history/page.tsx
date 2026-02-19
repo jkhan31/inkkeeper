@@ -11,14 +11,15 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
+import SessionCard from '@/components/SessionCard'
 
 // Session shape mirrors the Supabase sessions table structure
 interface Session {
   id: string
   created_at: string
   duration_minutes: number
-  book_title: string | null
-  note: string | null
+  book_title: string
+  main_reflection: string
 }
 
 export default function History() {
@@ -99,12 +100,7 @@ export default function History() {
         ) : (
           <div className="flex flex-col gap-4">
             {sessions.map((session) => (
-              <div key={session.id} className="bg-white border border-[#E5E5E5] p-4">
-                <p>{new Date(session.created_at).toLocaleString()}</p>
-                <p>Duration: {session.duration_minutes} minutes</p>
-                {session.book_title && <p>Book: {session.book_title}</p>}
-                {session.note && <p>Note: {session.note}</p>}
-              </div>
+              <SessionCard key={session.id} session={session} />
             ))}
           </div>
         )}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useRouter } from 'next/navigation'
+import SessionCard from '@/components/SessionCard'
 
 /**
  * Dashboard: Main landing page after authentication
@@ -108,21 +109,6 @@ export default function Dashboard() {
         router.push('/login')
     }
 
-    // Format date helper
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-GB', {
-            day: 'numeric',
-            month: 'long',
-            year: 'numeric'
-        })
-    }
-
-    // Truncate text with ellipsis
-    const truncateText = (text: string, maxLength: number = 120) => {
-        if (text.length <= maxLength) return text
-        return text.slice(0, maxLength).trim() + '...'
-    }
-
     // Format minutes to hours and minutes
     const formatTime = (minutes: number) => {
         if (minutes < 60) {
@@ -186,21 +172,7 @@ export default function Dashboard() {
                         </div>
                         <div className="flex flex-col gap-3">
                             {recentSessions.map((session) => (
-                                <div 
-                                    key={session.id} 
-                                    className="bg-white border border-[#E5E5E5] p-4 cursor-pointer hover:border-[#3F5A4A] transition-colors"
-                                    onClick={() => router.push('/history')}
-                                >
-                                    <div className="text-xs opacity-60 mb-2">
-                                        {formatDate(session.created_at)}
-                                    </div>
-                                    <div className="font-medium mb-2">
-                                        {session.book_title}
-                                    </div>
-                                    <div className="text-sm opacity-80 leading-relaxed">
-                                        {truncateText(session.main_reflection)}
-                                    </div>
-                                </div>
+                                <SessionCard key={session.id} session={session} />
                             ))}
                         </div>
                     </div>
