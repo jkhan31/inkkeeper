@@ -16,6 +16,11 @@ interface SessionData {
 export default function Log() {
     const router = useRouter()
     const [sessionData, setSessionData] = useState<SessionData | null>(null)
+    const [bookTitle, setBookTitle] = useState('')
+    const [mainReflection, setMainReflection] = useState('')
+    const [additionalNotes, setAdditionalNotes] = useState('')
+    const [validationError, setValidationError] = useState('')
+    const [isSaving, setIsSaving] = useState(false)
 
     // ═══════════════════════════════════════════════════════════
     // Load session from sessionStorage
@@ -45,8 +50,24 @@ export default function Log() {
         return <div>Loading...</div>
     }
 
-    const formatTime = (timestamp: number) => {
-        return new Date(timestamp).toLocaleString()
+    const formatDate = (timestamp: number) => {
+        return new Date(timestamp).toLocaleDateString('en-GB', { 
+            day: 'numeric', 
+            month: 'long', 
+            year: 'numeric' 
+        })
+    }
+
+    const formatDuration = (minutes: number) => {
+        if (minutes >= 60) {
+            const hours = Math.floor(minutes / 60)
+            const remainingMinutes = minutes % 60
+            if (remainingMinutes === 0) {
+                return `${hours} ${hours === 1 ? 'hour' : 'hours'}`
+            }
+            return `${hours} ${hours === 1 ? 'hour' : 'hours'} ${remainingMinutes} ${remainingMinutes === 1 ? 'minute' : 'minutes'}`
+        }
+        return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'}`
     }
 
     // ═══════════════════════════════════════════════════════════
@@ -56,6 +77,17 @@ export default function Log() {
     // sessionStorage is cleared only after successful insert (data safety)
     // router.replace used to prevent back-navigation to this page
     const handleSave = async () => {
+        // Prevent double submission
+        if (isSaving) return
+
+        // Validate required fields
+        if (!bookTitle.trim() || !mainReflection.trim()) {
+            setValidationError('Please fill in all required fields')
+            return
+        }
+
+        setValidationError('')
+        setIsSaving(true)
 
         if (!sessionData) return
 
@@ -65,6 +97,7 @@ export default function Log() {
             
             if (authError || !user) {
                 console.error('Authentication error:', authError)
+                setIsSaving(false)
                 return
             }
 
@@ -76,13 +109,14 @@ export default function Log() {
                     start_time: new Date(sessionData.startTime).toISOString(),
                     end_time: new Date(sessionData.endTime).toISOString(),
                     duration_minutes: sessionData.durationMinutes,
-
-                    book_title: null,
-                    note: null
+                    book_title: bookTitle.trim(),
+                    main_reflection: mainReflection.trim(),
+                    additional_notes: additionalNotes.trim() || null
                 })
 
             if (insertError) {
                 console.error('Failed to insert session:', insertError)
+                setIsSaving(false)
                 return
             }
 
@@ -93,6 +127,7 @@ export default function Log() {
             router.replace('/dashboard')
         } catch (error) {
             console.error('Unexpected error saving session:', error)
+            setIsSaving(false)
         }
     }
 
@@ -101,11 +136,52 @@ export default function Log() {
             <h1>Log Session</h1>
 
             <div>
-                <h2>Duration: {sessionData.durationMinutes} minutes</h2>
-                <p>Start: {formatTime(sessionData.startTime)}</p>
-                <p>End: {formatTime(sessionData.endTime)}</p>
+                <p><strong>{formatDate(sessionData.startTime)}</strong></p>
+                <p><strong>Duration:</strong> {formatDuration(sessionData.durationMinutes)}</p>
             </div>
-            <button onClick={handleSave}>Save</button>
+
+            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
+                <div>
+                    <label htmlFor="bookTitle">Book Title *</label>
+                    <input
+                        id="bookTitle"
+                        type="text"
+                        value={bookTitle}
+                        onChange={(e) => setBookTitle(e.target.value)}
+                        placeholder="Enter book title"
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="mainReflection">What stood out most? *</label>
+                    <textarea
+                        id="mainReflection"
+                        value={mainReflection}
+                        onChange={(e) => setMainReflection(e.target.value)}
+                        placeholder="Share your main reflection"
+                        rows={4}
+                    />
+                </div>
+
+                <div>
+                    <label htmlFor="additionalNotes">Additional notes</label>
+                    <textarea
+                        id="additionalNotes"
+                        value={additionalNotes}
+                        onChange={(e) => setAdditionalNotes(e.target.value)}
+                        placeholder="Any other thoughts? (optional)"
+                        rows={3}
+                    />
+                </div>
+
+                {validationError && (
+                    <p style={{ color: 'red' }}>{validationError}</p>
+                )}
+
+                <button type="submit" disabled={isSaving}>
+                    {isSaving ? 'Saving...' : 'Save'}
+                </button>
+            </form>
         </main>
     )
 }
