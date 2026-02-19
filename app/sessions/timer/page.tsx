@@ -88,7 +88,7 @@ export default function Active() {
             JSON.stringify(sessionData)
         )
 
-        router.push('/session/reflection')
+        router.push('/sessions/reflection')
     }
 
     // ─── Display Logic ────────────────────────────────────────────────────────

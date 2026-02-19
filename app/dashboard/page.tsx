@@ -152,7 +152,7 @@ export default function Dashboard() {
 
                 {/* Primary Action: Start Session */}
                 <button
-                    onClick={() => router.push('/session/timer')}
+                    onClick={() => router.push('/sessions/timer')}
                     className="w-full bg-[#3F5A4A] text-white px-6 py-4 text-lg font-medium hover:bg-[#2F4A3A] transition-colors"
                 >
                     Start Session
