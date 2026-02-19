@@ -4,9 +4,9 @@
 
 /login  
 /dashboard  
-/session/setup  
-/session/timer  
-/session/reflection  
+/sessions/setup  
+/sessions/timer  
+/sessions/reflection  
 /history  
 
 ---
@@ -19,13 +19,13 @@ Authenticate via Magic Link.
 /dashboard  
 Practice overview + entry point.
 
-/session/setup  
+/sessions/setup  
 Select duration deliberately.
 
-/session/timer  
+/sessions/timer  
 Focused reading container.
 
-/session/reflection  
+/sessions/reflection  
 Record book + optional reflection.
 
 /history  

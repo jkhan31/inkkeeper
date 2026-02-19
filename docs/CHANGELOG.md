@@ -14,9 +14,9 @@ Versioning is milestone-based and aligned with architectural phases.
 - Sacred loop routing:
   - /login
   - /dashboard
-  - /session/setup
-  - /session/timer
-  - /session/reflection
+  - /sessions/setup
+  - /sessions/timer
+  - /sessions/reflection
   - /history
 - Timestamp-based ritual timer (start_time / end_time)
 - Pause duration exclusion from persisted duration

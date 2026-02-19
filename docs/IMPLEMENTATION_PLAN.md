@@ -41,9 +41,9 @@ Routes:
 
 - /login
 - /dashboard
-- /session/setup
-- /session/timer
-- /session/reflection
+- /sessions/setup
+- /sessions/timer
+- /sessions/reflection
 - /history
 
 Build static UI first.
