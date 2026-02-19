@@ -108,7 +108,7 @@ export default function Dashboard() {
 
                 {/* Primary Action: Session Creation */}
                 <button
-                    onClick={() => router.push('/session/setup')}
+                    onClick={() => router.push('/session/active')}
                     className="bg-[#3F5A4A] text-white px-6 py-3"
                 >
                     Begin Session

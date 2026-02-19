@@ -6,23 +6,16 @@ import { useRouter } from 'next/navigation'
 /**
  * Active Session Page
  * 
- * Runs a reading timer that counts down from a target duration,
- * then continues counting up if the session goes beyond the target.
+ * Runs a reading timer that counts up from 0 seconds.
  * Supports pause/resume to exclude breaks during a reading session.
+ * Requires minimum 5 minutes before ending the session.
  */
 export default function Active() {
     const router = useRouter()
 
     // ─── Session Configuration ────────────────────────────────────────────────
 
-    const [targetDurationMinutes] = useState(() => {
-        if (typeof window === 'undefined') return 15
-        const stored = sessionStorage.getItem('inkkeeper_selected_duration')
-        return stored ? Number(stored) : 15
-    })
-    const targetSeconds = targetDurationMinutes * 60
-
-    const minimumSessionSeconds = 5 // 5 seconds for testing, actual should be 5 * 60
+    const minimumSessionSeconds = 5 // * 60 // 5 minutes, 5 seconds for testing
 
     // ─── Time Tracking (refs to avoid re-render on every calculation) ─────────
 
@@ -57,7 +50,7 @@ export default function Active() {
     }
 
     // ─── Pause & Resume ───────────────────────────────────────────────────────
-    // Tracks paused duration separately to exclude break time from billable hours
+    // Tracks paused duration separately to exclude break time from reading time
 
     const handlePauseResume = () => {
         if (isPaused) {
@@ -84,11 +77,6 @@ export default function Active() {
             pauseStartRef.current = null
         }
 
-        if (elapsedSeconds < minimumSessionSeconds) {
-            alert(`Minimum session is ${minimumSessionSeconds} seconds while testing. Update code when ready.`)
-            return
-        }
-
         const sessionData = {
             startTime: startTimeRef.current,
             endTime: Date.now(),
@@ -104,26 +92,28 @@ export default function Active() {
     }
 
     // ─── Display Logic ────────────────────────────────────────────────────────
-    // Countdown to target duration, then switch to count-up for overrun
+    // Count up from 0 seconds
 
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
-
-    let displaySeconds: number
-
-    if (elapsedSeconds < targetSeconds) {
-        displaySeconds = targetSeconds - elapsedSeconds
-    } else {
-        displaySeconds = elapsedSeconds
-    }
+    const canEndSession = elapsedSeconds >= minimumSessionSeconds
 
     return (
         <main>
             <h1>Active Session</h1>
-            <div>{formatTime(displaySeconds)}</div>
+            <div>{formatTime(elapsedSeconds)}</div>
             <button onClick={handlePauseResume}>
                 {isPaused ? 'Resume' : 'Pause'}
             </button>
-            <button onClick={handleEnd}>End</button>
+            <button 
+                onClick={handleEnd}
+                disabled={!canEndSession}
+                style={{
+                    opacity: canEndSession ? 1 : 0.5,
+                    cursor: canEndSession ? 'pointer' : 'not-allowed'
+                }}
+            >
+                End Session
+            </button>
         </main>
     )
 }
