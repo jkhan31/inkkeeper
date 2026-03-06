@@ -47,7 +47,7 @@ export default function Log() {
 
     // Guard: wait for session data to load
     if (!sessionData) {
-        return <div>Loading...</div>
+        return <main className="min-h-screen bg-[#FAF5F0]" />
     }
 
     const formatDate = (timestamp: number) => {
@@ -132,56 +132,73 @@ export default function Log() {
     }
 
     return (
-        <main>
-            <h1>Log Session</h1>
+        <main className="flex min-h-screen flex-col items-center bg-[#FAF5F0] text-[#1A1A1A] pt-10 pb-16 px-6">
+            <div className="w-full max-w-md flex flex-col gap-6">
+                <div>
+                    <h1 className="text-2xl font-semibold tracking-tight">Log Session</h1>
+                    <p className="text-sm text-[#1A1A1A]/40 mt-1">
+                        {formatDate(sessionData.startTime)} · {formatDuration(sessionData.durationMinutes)}
+                    </p>
+                </div>
 
-            <div>
-                <p><strong>{formatDate(sessionData.startTime)}</strong></p>
-                <p><strong>Duration:</strong> {formatDuration(sessionData.durationMinutes)}</p>
+                <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col gap-4">
+                    <div className="bg-white rounded-[2rem] border border-[#1A1A1A]/5 p-6 flex flex-col gap-6">
+                        <div>
+                            <label htmlFor="bookTitle" className="text-xs font-medium text-[#1A1A1A]/40 uppercase tracking-widest mb-2 block">
+                                Book Title *
+                            </label>
+                            <input
+                                id="bookTitle"
+                                type="text"
+                                value={bookTitle}
+                                onChange={(e) => setBookTitle(e.target.value)}
+                                placeholder="Enter book title"
+                                className="w-full border-b border-[#1A1A1A]/10 bg-transparent pb-2 text-[#1A1A1A] placeholder:text-[#1A1A1A]/30 focus:outline-none focus:border-[#8F270D] transition-colors"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="mainReflection" className="text-xs font-medium text-[#1A1A1A]/40 uppercase tracking-widest mb-2 block">
+                                What stood out most? *
+                            </label>
+                            <textarea
+                                id="mainReflection"
+                                value={mainReflection}
+                                onChange={(e) => setMainReflection(e.target.value)}
+                                placeholder="Share your main reflection"
+                                rows={4}
+                                className="w-full bg-transparent resize-none border-b border-[#1A1A1A]/10 pb-2 text-[#1A1A1A] placeholder:text-[#1A1A1A]/30 focus:outline-none focus:border-[#8F270D] transition-colors"
+                            />
+                        </div>
+
+                        <div>
+                            <label htmlFor="additionalNotes" className="text-xs font-medium text-[#1A1A1A]/40 uppercase tracking-widest mb-2 block">
+                                Additional notes
+                            </label>
+                            <textarea
+                                id="additionalNotes"
+                                value={additionalNotes}
+                                onChange={(e) => setAdditionalNotes(e.target.value)}
+                                placeholder="Any other thoughts? (optional)"
+                                rows={3}
+                                className="w-full bg-transparent resize-none text-[#1A1A1A] placeholder:text-[#1A1A1A]/30 focus:outline-none"
+                            />
+                        </div>
+                    </div>
+
+                    {validationError && (
+                        <p className="text-sm text-[#8F270D] text-center">{validationError}</p>
+                    )}
+
+                    <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="w-full bg-[#8F270D] text-white rounded-full px-4 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                    >
+                        {isSaving ? 'Saving...' : 'Save Reflection'}
+                    </button>
+                </form>
             </div>
-
-            <form onSubmit={(e) => { e.preventDefault(); handleSave(); }}>
-                <div>
-                    <label htmlFor="bookTitle">Book Title *</label>
-                    <input
-                        id="bookTitle"
-                        type="text"
-                        value={bookTitle}
-                        onChange={(e) => setBookTitle(e.target.value)}
-                        placeholder="Enter book title"
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="mainReflection">What stood out most? *</label>
-                    <textarea
-                        id="mainReflection"
-                        value={mainReflection}
-                        onChange={(e) => setMainReflection(e.target.value)}
-                        placeholder="Share your main reflection"
-                        rows={4}
-                    />
-                </div>
-
-                <div>
-                    <label htmlFor="additionalNotes">Additional notes</label>
-                    <textarea
-                        id="additionalNotes"
-                        value={additionalNotes}
-                        onChange={(e) => setAdditionalNotes(e.target.value)}
-                        placeholder="Any other thoughts? (optional)"
-                        rows={3}
-                    />
-                </div>
-
-                {validationError && (
-                    <p style={{ color: 'red' }}>{validationError}</p>
-                )}
-
-                <button type="submit" disabled={isSaving}>
-                    {isSaving ? 'Saving...' : 'Save'}
-                </button>
-            </form>
         </main>
     )
 }

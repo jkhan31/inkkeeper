@@ -8,10 +8,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { supabase } from '@/lib/supabaseClient'
 import SessionCard from '@/components/SessionCard'
+import { useAuthGuard } from '@/lib/hooks/useAuthGuard'
 
 // Session shape mirrors the Supabase sessions table structure
 interface Session {
@@ -23,27 +23,16 @@ interface Session {
 }
 
 export default function History() {
+  const { user, loading } = useAuthGuard()
   const [sessions, setSessions] = useState<Session[]>([])
-  const [loading, setLoading] = useState(true)
-  const router = useRouter()
+  const [dataLoading, setDataLoading] = useState(false)
 
   useEffect(() => {
-    const fetchData = async () => {
-      // ─────────────────────────────────────────────────────────
-      // Authentication check
-      // ─────────────────────────────────────────────────────────
-      // Verify user session before loading data to prevent unauthorized access
-      const { data: { user }, error: authError } = await supabase.auth.getUser()
-      
-      if (authError || !user) {
-        router.replace('/login')
-        return
-      }
+    if (!user) return
 
-      // ─────────────────────────────────────────────────────────
-      // Fetch all sessions
-      // ─────────────────────────────────────────────────────────
-      // Ordered newest-first to show most recent reading activity at the top
+    const fetchSessions = async () => {
+      setDataLoading(true)
+
       const { data, error } = await supabase
         .from('sessions')
         .select('*')
@@ -52,16 +41,16 @@ export default function History() {
       if (!error && data) {
         setSessions(data)
       }
-      
-      setLoading(false)
+
+      setDataLoading(false)
     }
 
-    fetchData()
-  }, [router])
+    fetchSessions()
+  }, [user])
 
-  // Prevent flash of empty state while authentication and data load
-  if (loading) {
-    return <main><p>Loading...</p></main>
+  // Prevent layout shift while auth check and data fetch resolve
+  if (loading || dataLoading) {
+    return <main className="min-h-screen bg-[#FAF5F0]" />
   }
 
   // ─────────────────────────────────────────────────────────
@@ -75,17 +64,17 @@ export default function History() {
   // ─────────────────────────────────────────────────────────
   return (
     <main className="flex min-h-screen flex-col items-center gap-8 pt-12 bg-[#FAF5F0] text-[#1A1A1A]">
-      <h1>History</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">History</h1>
 
       {/* Lifetime Summary */}
       <div>
-        <h2 className="text-lg font-semibold mb-3">Your Reading Record</h2>
+        <h2 className="text-lg font-semibold tracking-tight mb-3">Your Reading Record</h2>
         <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-          <div className="bg-white border border-[#E5E5E5] p-4">
+          <div className="bg-white border border-[#1A1A1A]/5 rounded-[2rem] p-4">
             <div className="text-2xl font-semibold">{totalSessions}</div>
             <div className="text-sm font-medium">Sessions</div>
           </div>
-          <div className="bg-white border border-[#E5E5E5] p-4">
+          <div className="bg-white border border-[#1A1A1A]/5 rounded-[2rem] p-4">
             <div className="text-2xl font-semibold">{totalMinutes}</div>
             <div className="text-sm font-medium">Minutes</div>
           </div>
@@ -107,7 +96,7 @@ export default function History() {
       </div>
 
       <Link href="/dashboard">
-        <button>Back</button>
+        <button className="border border-[#8F270D] text-[#8F270D] rounded-full px-6 py-2.5 font-medium hover:bg-[#8F270D]/5 transition-colors">Back</button>
       </Link>
     </main>
   )

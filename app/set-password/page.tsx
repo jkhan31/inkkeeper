@@ -90,48 +90,48 @@ export default function SetPassword() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-[#FAF5F0] text-[#1A1A1A]">
+        <main className="flex min-h-screen flex-col items-center justify-center bg-[#FAF5F0] text-[#1A1A1A]">
             <div className="flex flex-col gap-4 w-80">
-                <h1 className="text-2xl font-bold text-center">
+                <h1 className="text-2xl font-bold text-center tracking-tight mb-2">
                     {requiresCurrentPassword ? 'Change Password' : 'Set Password'}
                 </h1>
-                
+
                 {requiresCurrentPassword && (
                     <input
                         type="password"
                         placeholder="Current password"
                         value={currentPassword}
                         onChange={(e) => setCurrentPassword(e.target.value)}
-                        className="border p-2"
+                        className="border border-[#1A1A1A]/20 rounded-lg px-4 py-2.5 bg-white text-[#1A1A1A] placeholder:text-[#1A1A1A]/40 focus:outline-none focus:border-[#8F270D] transition-colors"
                     />
                 )}
-                
+
                 <input
                     type="password"
                     placeholder="New password"
                     value={newPassword}
                     onChange={(e) => setNewPassword(e.target.value)}
-                    className="border p-2"
+                    className="border border-[#1A1A1A]/20 rounded-lg px-4 py-2.5 bg-white text-[#1A1A1A] placeholder:text-[#1A1A1A]/40 focus:outline-none focus:border-[#8F270D] transition-colors"
                 />
-                
+
                 <input
                     type="password"
                     placeholder="Confirm password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="border p-2"
+                    className="border border-[#1A1A1A]/20 rounded-lg px-4 py-2.5 bg-white text-[#1A1A1A] placeholder:text-[#1A1A1A]/40 focus:outline-none focus:border-[#8F270D] transition-colors"
                 />
 
                 <button
                     onClick={handleSubmit}
                     disabled={loading}
-                    className="bg-[#802B0A] text-white px-4 py-2"
+                    className="bg-[#8F270D] text-white rounded-full px-4 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
                 >
                     {loading ? 'Saving...' : 'Save'}
                 </button>
 
                 {message && (
-                    <p className="text-sm text-center text-red-600">{message}</p>
+                    <p className="text-sm text-center text-[#8F270D]">{message}</p>
                 )}
             </div>
         </main>

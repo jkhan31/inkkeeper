@@ -21,18 +21,18 @@ export default function SessionCard({ session }: SessionCardProps) {
   return (
     <Link
       href={`/sessions/${session.id}`}
-      className="block border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+      className="block bg-white border border-[#1A1A1A]/5 rounded-[2rem] p-5 hover:bg-[#FAF5F0] transition-colors"
     >
       <div className="flex justify-between items-start gap-4 mb-2">
-        <h3 className="text-lg font-semibold text-gray-900 leading-tight">
+        <h3 className="text-lg font-semibold text-[#1A1A1A] leading-tight tracking-tight">
           {session.book_title}
         </h3>
-        <span className="text-sm text-gray-500 whitespace-nowrap">
+        <span className="text-sm text-[#1A1A1A]/40 whitespace-nowrap">
           {formatDate(session.created_at)}
         </span>
       </div>
       {session.main_reflection && (
-        <p className="text-gray-600 line-clamp-2">
+        <p className="text-[#1A1A1A]/60 line-clamp-2">
           {session.main_reflection}
         </p>
       )}

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
+import { useAuthGuard } from '@/lib/hooks/useAuthGuard'
 
 /**
  * Active Session Page
@@ -12,6 +13,7 @@ import { useRouter } from 'next/navigation'
  */
 export default function Active() {
     const router = useRouter()
+    const { user, loading } = useAuthGuard()
 
     // ─── Session Configuration ────────────────────────────────────────────────
 
@@ -97,23 +99,42 @@ export default function Active() {
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
     const canEndSession = elapsedSeconds >= minimumSessionSeconds
 
+    // Prevent layout shift while auth check resolves
+    if (loading) return <main className="min-h-screen bg-[#FAF5F0]" />
+
     return (
-        <main>
-            <h1>Active Session</h1>
-            <div>{formatTime(elapsedSeconds)}</div>
-            <button onClick={handlePauseResume}>
-                {isPaused ? 'Resume' : 'Pause'}
-            </button>
-            <button 
-                onClick={handleEnd}
-                disabled={!canEndSession}
-                style={{
-                    opacity: canEndSession ? 1 : 0.5,
-                    cursor: canEndSession ? 'pointer' : 'not-allowed'
-                }}
-            >
-                End Session
-            </button>
+        <main className="flex min-h-screen flex-col items-center justify-center bg-[#FAF5F0] text-[#1A1A1A]">
+            <div className="flex flex-col items-center gap-8">
+                <p className="text-xs font-medium tracking-widest uppercase text-[#1A1A1A]/40">
+                    Active Session
+                </p>
+
+                <div className="flex flex-col items-center gap-2">
+                    <span className="text-8xl font-semibold tracking-tight tabular-nums">
+                        {formatTime(elapsedSeconds)}
+                    </span>
+                    {isPaused && (
+                        <span className="text-sm text-[#1A1A1A]/40 tracking-wide">Paused</span>
+                    )}
+                </div>
+
+                <div className="flex gap-3">
+                    <button
+                        onClick={handlePauseResume}
+                        className="border border-[#1A1A1A]/20 text-[#1A1A1A]/60 rounded-full px-6 py-2.5 font-medium hover:border-[#8F270D] hover:text-[#8F270D] transition-colors"
+                    >
+                        {isPaused ? 'Resume' : 'Pause'}
+                    </button>
+
+                    <button
+                        onClick={handleEnd}
+                        disabled={!canEndSession}
+                        className="bg-[#8F270D] text-white rounded-full px-6 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                    >
+                        End Session
+                    </button>
+                </div>
+            </div>
         </main>
     )
 }

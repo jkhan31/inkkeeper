@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import SessionCard from '@/components/SessionCard'
+import { useAuthGuard } from '@/lib/hooks/useAuthGuard'
 
 /**
  * Dashboard: Main landing page after authentication
@@ -22,7 +23,7 @@ interface Session {
 }
 
 export default function Dashboard() {
-    const [user, setUser] = useState<any>(null)
+    const { user, loading } = useAuthGuard()
     const [weeklySessionCount, setWeeklySessionCount] = useState<number>(0)
     const [weeklyMinutesTotal, setWeeklyMinutesTotal] = useState<number>(0)
     const [recentSessions, setRecentSessions] = useState<Session[]>([])
@@ -85,23 +86,12 @@ export default function Dashboard() {
         }
     }
 
-    // Auth Gate: Verify session exists before rendering dashboard
-    // Uses replace() to prevent back-navigation to this page when logged out
+    // Fetch data once the auth guard confirms the session
     useEffect(() => {
-        const checkSession = async () => {
-            const { data, error } = await supabase.auth.getSession()
-
-            if (!data.session) {
-                router.replace('/login')
-            } else {
-                setUser(data.session.user)
-                await fetchWeeklyMetrics()
-                await fetchRecentSessions()
-            }
-        }
-
-        checkSession()
-    }, [router])
+        if (!user) return
+        fetchWeeklyMetrics()
+        fetchRecentSessions()
+    }, [user])
 
     // Logout Flow: Clear Supabase session and return to login
     const handleLogout = async () => {
@@ -122,14 +112,14 @@ export default function Dashboard() {
         return `${hours} ${hours === 1 ? 'hour' : 'hours'} ${remainingMinutes} ${remainingMinutes === 1 ? 'minute' : 'minutes'}`
     }
 
-    // Prevent flash of content while auth check completes
-    if (!user) return null
+    // Prevent layout shift while auth check resolves
+    if (loading) return <main className="min-h-screen bg-[#FAF5F0]" />
 
     return (
         <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A] pt-8 pb-16">
             {/* Header - left aligned */}
-            <header className="w-full max-w-md mx-auto px-8 mb-8">
-                <h2 className="text-2xl">InkKeeper</h2>
+            <header className="w-full max-w-md mx-auto px-8 mb-12">
+                <h2 className="text-2xl font-bold tracking-tight text-center">InkKeeper</h2>
             </header>
 
             {/* Main content - centered */}
@@ -138,7 +128,7 @@ export default function Dashboard() {
                 {/* Weekly Metrics Summary */}
                 <div className="w-full">
                     <h3 className="text-sm font-medium mb-3 opacity-60">This Week</h3>
-                    <div className="bg-white border border-[#E5E5E5] p-4">
+                    <div className="bg-white border border-[#1A1A1A]/5 rounded-[2rem] p-6">
                         <div className="grid grid-cols-2 gap-8">
                             <div className="text-left">
                                 <div className="text-sm font-medium">{weeklySessionCount} {weeklySessionCount === 1 ? 'session' : 'sessions'}</div>
@@ -153,7 +143,7 @@ export default function Dashboard() {
                 {/* Primary Action: Start Session */}
                 <button
                     onClick={() => router.push('/sessions/timer')}
-                    className="w-full bg-[#3F5A4A] text-white px-6 py-4 text-lg font-medium hover:bg-[#2F4A3A] transition-colors"
+                    className="w-full bg-[#8F270D] text-white rounded-full px-6 py-4 text-lg font-serif hover:opacity-90 disabled:opacity-50 transition-opacity"
                 >
                     Start Session
                 </button>
