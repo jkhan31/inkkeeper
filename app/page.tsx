@@ -1,28 +1,72 @@
-import SessionCard from '@/components/SessionCard';
+'use client'
 
-export default function Home() {
-  // Assume sessions array exists
-  const sessions: Array<{
-    id: string;
-    created_at: string;
-    book_title: string;
-    main_reflection: string;
-  }> = [];
+import { useCallback } from 'react'
+import { Header } from '@/components/landing/Header'
+import { Footer } from '@/components/landing/Footer'
+import { HeroSection } from '@/sections/HeroSection'
+import { ProblemSection } from '@/sections/ProblemSection'
+import { SolutionSection } from '@/sections/SolutionSection'
+import { ValueSection } from '@/sections/ValueSection'
+import { DifferentiationSection } from '@/sections/DifferentiationSection'
+import { FeaturesSection } from '@/sections/FeaturesSection'
+import { TestimonialsSection } from '@/sections/TestimonialsSection'
+import { PricingSection } from '@/sections/PricingSection'
+import { ClosingCTASection } from '@/sections/ClosingCTASection'
 
-  const recentSessions = sessions
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-    .slice(0, 3);
+export default function LandingPage() {
+  const scrollToSection = useCallback((id: string) => {
+    const element = document.getElementById(id)
+    if (element) {
+      const offset = 80 // Offset for the sticky header
+      const bodyRect = document.body.getBoundingClientRect().top
+      const elementRect = element.getBoundingClientRect().top
+      const elementPosition = elementRect - bodyRect
+      const offsetPosition = elementPosition - offset
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      })
+    }
+  }, [])
 
   return (
-    <main className="min-h-screen bg-[#FAF5F0] text-[#1A1A1A] p-8">
-      <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold mb-6">Recent Sessions</h1>
-        <div className="space-y-4">
-          {recentSessions.map((session) => (
-            <SessionCard key={session.id} session={session} />
-          ))}
+    <div className="relative min-h-screen selection:bg-deep-moss/10">
+      {/* Visual Texture */}
+      <div className="grain-overlay" />
+
+      <Header onNavigate={scrollToSection} />
+
+      <main>
+        <HeroSection onNavigate={scrollToSection} />
+
+        <div id="problem">
+          <ProblemSection />
         </div>
-      </div>
-    </main>
-  );
+
+        <div id="solution">
+          <SolutionSection />
+        </div>
+
+        <ValueSection />
+        <DifferentiationSection />
+
+        <div id="features">
+          <FeaturesSection />
+        </div>
+
+        <div id="testimonials">
+          <TestimonialsSection />
+        </div>
+
+        <div id="pricing">
+          <PricingSection />
+        </div>
+
+        <ClosingCTASection />
+      </main>
+
+      <Footer />
+    </div>
+  )
 }
