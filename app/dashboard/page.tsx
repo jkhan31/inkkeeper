@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import SessionCard from '@/components/SessionCard'
@@ -47,7 +47,7 @@ export default function Dashboard() {
     }
 
     // Fetch weekly metrics from sessions table
-    const fetchWeeklyMetrics = async () => {
+    const fetchWeeklyMetrics = useCallback(async () => {
         const { start, end } = getWeekBounds()
         
         const { data, error } = await supabase
@@ -66,10 +66,10 @@ export default function Dashboard() {
             const totalMinutes = data.reduce((sum, session) => sum + (session.duration_minutes || 0), 0)
             setWeeklyMinutesTotal(totalMinutes)
         }
-    }
+    }, [])
 
     // Fetch 3 most recent sessions for preview
-    const fetchRecentSessions = async () => {
+    const fetchRecentSessions = useCallback(async () => {
         const { data, error } = await supabase
             .from('sessions')
             .select('id, created_at, duration_minutes, book_title, main_reflection')
@@ -84,14 +84,15 @@ export default function Dashboard() {
         if (data) {
             setRecentSessions(data)
         }
-    }
+    }, [])
 
     // Fetch data once the auth guard confirms the session
     useEffect(() => {
         if (!user) return
+        // eslint-disable-next-line react-hooks/set-state-in-effect
         fetchWeeklyMetrics()
         fetchRecentSessions()
-    }, [user])
+    }, [user, fetchWeeklyMetrics, fetchRecentSessions])
 
     // Logout Flow: Clear Supabase session and return to login
     const handleLogout = async () => {
@@ -145,7 +146,7 @@ export default function Dashboard() {
                     onClick={() => router.push('/sessions/timer')}
                     className="w-full bg-[#8F270D] text-white rounded-full px-6 py-4 text-lg font-serif hover:opacity-90 disabled:opacity-50 transition-opacity"
                 >
-                    Start Session
+                    Start Reading
                 </button>
 
                 {/* Recent Sessions */}

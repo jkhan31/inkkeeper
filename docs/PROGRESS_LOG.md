@@ -2,6 +2,42 @@
 
 ---
 
+## 2026-03-06 — UI Polish + Timer Resilience + PWA Foundation
+
+### Completed
+
+- "Start Reading" label replaces "Start Session" on dashboard CTA — aligns button copy with product language
+- Back button added to timer page with abandon confirmation modal — guards against accidental session loss without blocking the user
+- Timer state persistence implemented — elapsed ms stored in `sessionStorage` so returning from reflection does not reset the timer
+- `handleAbandon` clears all session state (`inkkeeper_active_session`, `inkkeeper_timer_state`) and routes to dashboard
+- Reflection page extended to clear `inkkeeper_timer_state` on successful save — write path is now fully clean
+- Back buttons added consistently across forgot-password, set-password, history, and reflection pages using a shared top-bar pattern
+- Set-password flow shifted to recovery-mode handling for reset-link sessions, removing current-password verification from this screen
+- Session detail page (`/sessions/[id]`) fully restyled to match app-wide design language
+- App metadata updated in `layout.tsx`: title, description, and PWA manifest reference
+- `public/manifest.json` added — app is now installable as a standalone PWA
+- `public/_redirects` added — SPA routing works correctly in static deployment
+- Playwright tooling scaffolded: dependency installed, `playwright.config.ts` created, and authenticated setup test added (`tests/auth.setup.ts`)
+- GitHub Actions Playwright workflow added (`.github/workflows/playwright.yml`) with artifact upload for test reports
+- Starter Playwright spec added (`tests/example.spec.ts`) to validate baseline runner wiring
+- `.gitignore` updated for Playwright outputs/auth state, coverage artifacts, and Netlify folder handling
+- `hooks/useAuthGuard.ts` re-export stub removed; import paths consolidated to `lib/hooks/useAuthGuard`
+- Default Next.js placeholder assets removed
+
+### Decisions
+
+- Confirmation modal preferred over immediate back-navigation on the timer page — preserves session integrity without locking the user in
+- Timer state stored in `sessionStorage` rather than passed via URL params — avoids polluting the navigation stack
+- Reflection page takes responsibility for clearing timer state after a successful save — keeps cleanup at the point of completion
+
+### Notes
+
+- Duration memory (UserPreferences) still not implemented
+- Inline history expansion still not implemented
+- 4-minute guardrail confirmation still not implemented
+
+---
+
 ## 2026-03-06 — Auth Guard + Loading States + Manifesto
 
 ### Completed

@@ -15,7 +15,19 @@ interface SessionData {
 
 export default function Log() {
     const router = useRouter()
-    const [sessionData, setSessionData] = useState<SessionData | null>(null)
+    const [sessionData] = useState<SessionData | null>(() => {
+        if (typeof window === 'undefined') return null
+
+        const storedSession = sessionStorage.getItem('inkkeeper_active_session')
+        if (!storedSession) return null
+
+        try {
+            return JSON.parse(storedSession) as SessionData
+        } catch (error) {
+            console.error('Failed to parse session data:', error)
+            return null
+        }
+    })
     const [bookTitle, setBookTitle] = useState('')
     const [mainReflection, setMainReflection] = useState('')
     const [additionalNotes, setAdditionalNotes] = useState('')
@@ -25,25 +37,12 @@ export default function Log() {
     // ═══════════════════════════════════════════════════════════
     // Load session from sessionStorage
     // ═══════════════════════════════════════════════════════════
-    // Session data arrives here via sessionStorage after redirect from /sessions/timer
-    // If missing, user arrived incorrectly — redirect back to dashboard
+    // If session data is missing, user arrived incorrectly — redirect to dashboard.
     useEffect(() => {
-        const storedSession = sessionStorage.getItem('inkkeeper_active_session')
-        
-        if (!storedSession) {
-            router.push('/dashboard')
-            return
-        }
-
-        try {
-            const parsed: SessionData = JSON.parse(storedSession)
-            setSessionData(parsed)
-
-        } catch (error) {
-            console.error('Failed to parse session data:', error)
+        if (!sessionData) {
             router.push('/dashboard')
         }
-    }, [router])
+    }, [router, sessionData])
 
     // Guard: wait for session data to load
     if (!sessionData) {
@@ -122,6 +121,7 @@ export default function Log() {
 
             // Clean up temporary storage after successful persist
             sessionStorage.removeItem('inkkeeper_active_session')
+            sessionStorage.removeItem('inkkeeper_timer_state')
             
             // Use replace to prevent back-navigation to this page
             router.replace('/dashboard')
@@ -135,6 +135,15 @@ export default function Log() {
         <main className="flex min-h-screen flex-col items-center bg-[#FAF5F0] text-[#1A1A1A] pt-10 pb-16 px-6">
             <div className="w-full max-w-md flex flex-col gap-6">
                 <div>
+                    <button
+                        onClick={() => router.push('/sessions/timer')}
+                        className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors mb-8"
+                    >
+                        <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                        </svg>
+                        Back
+                    </button>
                     <h1 className="text-2xl font-semibold tracking-tight">Log Session</h1>
                     <p className="text-sm text-[#1A1A1A]/40 mt-1">
                         {formatDate(sessionData.startTime)} · {formatDuration(sessionData.durationMinutes)}

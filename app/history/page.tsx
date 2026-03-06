@@ -63,7 +63,20 @@ export default function History() {
   // Render session history
   // ─────────────────────────────────────────────────────────
   return (
-    <main className="flex min-h-screen flex-col items-center gap-8 pt-12 bg-[#FAF5F0] text-[#1A1A1A]">
+    <main className="flex min-h-screen flex-col items-center gap-8 pt-8 pb-16 bg-[#FAF5F0] text-[#1A1A1A]">
+      {/* Back button */}
+      <div className="w-full max-w-md px-8">
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors"
+        >
+          <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </Link>
+      </div>
+
       <h1 className="text-2xl font-semibold tracking-tight">History</h1>
 
       {/* Lifetime Summary */}
@@ -94,10 +107,6 @@ export default function History() {
           </div>
         )}
       </div>
-
-      <Link href="/dashboard">
-        <button className="border border-[#8F270D] text-[#8F270D] rounded-full px-6 py-2.5 font-medium hover:bg-[#8F270D]/5 transition-colors">Back</button>
-      </Link>
     </main>
   )
 }

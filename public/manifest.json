@@ -1,0 +1,8 @@
+{
+  "name": "InkKeeper",
+  "short_name": "InkKeeper",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#FAF5F0",
+  "theme_color": "#FAF5F0"
+}

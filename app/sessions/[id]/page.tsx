@@ -1,4 +1,3 @@
-import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { createClient } from '@/lib/supabase/server';
 
@@ -55,66 +54,58 @@ export default async function SessionDetailPage({ params }: PageProps) {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-8">
-      {/* Back button */}
-      <Link 
-        href="/dashboard" 
-        className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
-      >
-        <svg 
-          className="w-5 h-5 mr-2" 
-          fill="none" 
-          stroke="currentColor" 
-          viewBox="0 0 24 24"
+    <main className="min-h-screen bg-[#FAF5F0] text-[#1A1A1A]">
+      <div className="max-w-xl mx-auto px-6 py-10">
+        {/* Back button */}
+        <Link
+          href="/dashboard"
+          className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] mb-8 transition-colors"
         >
-          <path 
-            strokeLinecap="round" 
-            strokeLinejoin="round" 
-            strokeWidth={2} 
-            d="M15 19l-7-7 7-7" 
-          />
-        </svg>
-        Back
-      </Link>
+          <svg
+            className="w-4 h-4 mr-2"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 19l-7-7 7-7"
+            />
+          </svg>
+          Back
+        </Link>
 
-      {/* Date and duration */}
-      <div className="mb-4">
-        <p className="text-gray-900 mb-1">{formatDate(session.created_at)}</p>
-        <p className="text-sm text-gray-500">{formatDuration(session.duration_minutes)}</p>
-      </div>
+        {/* Date and duration */}
+        <div className="mb-4">
+          <p className="text-[#1A1A1A] mb-1">{formatDate(session.created_at)}</p>
+          <p className="text-sm text-[#1A1A1A]/50">{formatDuration(session.duration_minutes)}</p>
+        </div>
 
-      {/* Book title */}
-      <h1 className="text-3xl font-bold text-gray-900 mb-8">
-        {session.book_title}
-      </h1>
+        {/* Book title */}
+        <h1 className="text-3xl font-bold tracking-tight text-[#1A1A1A] mb-8">
+          {session.book_title}
+        </h1>
 
-      {/* Main reflection */}
-      <div className="mb-8">
-        <h2 className="text-lg font-semibold text-gray-900 mb-3">Reflection</h2>
-        <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-          {session.main_reflection}
-        </p>
-      </div>
-
-      {/* Additional notes (if present) */}
-      {session.additional_notes && (
+        {/* Main reflection */}
         <div className="mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-3">Additional Notes</h2>
-          <p className="text-gray-700 whitespace-pre-wrap leading-relaxed">
-            {session.additional_notes}
+          <h2 className="text-sm font-medium text-[#1A1A1A]/50 uppercase tracking-widest mb-3">Reflection</h2>
+          <p className="text-[#1A1A1A]/80 whitespace-pre-wrap leading-relaxed">
+            {session.main_reflection}
           </p>
         </div>
-      )}
 
-      {/* Edit button */}
-      <div className="pt-6 border-t border-gray-200">
-        <Link
-          href={`/sessions/${session.id}/edit`}
-          className="inline-block px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
-        >
-          Edit
-        </Link>
+        {/* Additional notes (if present) */}
+        {session.additional_notes && (
+          <div className="mb-8">
+            <h2 className="text-sm font-medium text-[#1A1A1A]/50 uppercase tracking-widest mb-3">Additional Notes</h2>
+            <p className="text-[#1A1A1A]/80 whitespace-pre-wrap leading-relaxed">
+              {session.additional_notes}
+            </p>
+          </div>
+        )}
       </div>
-    </div>
+    </main>
   );
 }

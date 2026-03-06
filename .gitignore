@@ -10,9 +10,6 @@
 !.yarn/releases
 !.yarn/versions
 
-# testing
-/coverage
-
 # next.js
 /.next/
 /out/
@@ -20,9 +17,25 @@
 # production
 /build
 
+# testing & coverage
+/coverage
+/test-results/
+/playwright-report/
+/blob-report/
+
+# playwright automation
+/playwright/.cache/
+/playwright/.auth/    # PRO TIP: This hides your 'user.json' session data
+
+# env files (NEVER commit these)
+.env*
+!.env.example         # Keep .env.example if you want to show required keys
+
 # misc
 .DS_Store
 *.pem
+*.tsbuildinfo
+next-env.d.ts
 
 # debug
 npm-debug.log*
@@ -30,12 +43,6 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
-
-# vercel
+# vercel/netlify
 .vercel
-
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+.netlify
