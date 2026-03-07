@@ -151,6 +151,30 @@
 
 ---
 
+## 2026-03-07 — Reflection Page Refinement & Technical Health Pass
+
+### Completed
+
+- **Reflection Page Refactored**: Implemented "Idea-First" hierarchy: Main Reflection (Hero italic serif) → Additional Notes → Visual Divider → Metadata row (Book Title, Date, Duration).
+- **Metadata Interaction**: Book title input in reflection page now styled as a subtle tracking-widest field, integrated directly into the metadata summary.
+- **Path Alias Migration**: Converted `@/` imports to relative paths across `app/archive`, `app/sessions/reflection`, and `app/sessions/[id]` to improve build stability.
+- **TypeScript Cleanup**: Resolved implicit 'any' types in session data parsing and parameter handling across dynamic routes.
+- **Playwright Suite Alignment**: Updated `tests/example.spec.ts` and related helpers to target the new `/archive` route.
+- **PWA Verification**: Confirmed `public/manifest.json` correctly points to `/dashboard` as `start_url` and uses the brand-consistent `#FAF5F0` theme.
+
+### Decisions
+
+- **Emphasis on Reflection**: UI hierarchy shifted to make the user's thought the primary focal point, reducing the friction of logging by treating metadata as secondary context.
+- **Build Resilience**: Favoring relative paths over aliases for v0.1 to avoid build-time issues in locked-down or non-standard deployment environments.
+
+### Notes
+
+- Inline history expansion: **Completed** (via SessionCard refactor)
+- 4-minute guardrail: **Removed** (Sacred Loop is now purely user-driven)
+- Duration memory: Still pending (deferred as lower priority in the "Quiet Archive" model)
+
+---
+
 ## 2026-03-07 — Timer & Archive Refactor: "The Quiet Archive"
 
 ### Completed

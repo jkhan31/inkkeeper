@@ -10,3 +10,8 @@ test('forgot password flow is reachable', async ({ page }) => {
   await page.getByRole('button', { name: /forgot password/i }).click();
   await expect(page).toHaveURL(/\/forgot-password$/);
 });
+
+test('archive page renders', async ({ page }) => {
+  await page.goto('/archive');
+  await expect(page.getByRole('heading', { name: /archive/i })).toBeVisible();
+});

@@ -4,6 +4,8 @@ import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useRouter } from 'next/navigation'
 import SessionCard from '../../components/SessionCard'
+
+
 import { useAuthGuard } from '../../lib/hooks/useAuthGuard'
 
 /**
@@ -20,7 +22,9 @@ interface Session {
     duration_minutes: number
     book_title: string
     main_reflection: string
+    additional_notes?: string
 }
+
 
 export default function Dashboard() {
     const { user, loading } = useAuthGuard()
@@ -72,9 +76,10 @@ export default function Dashboard() {
     const fetchRecentSessions = useCallback(async () => {
         const { data, error } = await supabase
             .from('sessions')
-            .select('id, created_at, duration_minutes, book_title, main_reflection')
+            .select('id, created_at, duration_minutes, book_title, main_reflection, additional_notes')
             .order('created_at', { ascending: false })
             .limit(3)
+
 
         if (error) {
             console.error('Error fetching recent sessions:', error)
@@ -166,6 +171,8 @@ export default function Dashboard() {
                                 <SessionCard key={session.id} session={session} />
                             ))}
                         </div>
+
+
                     </div>
                 )}
 

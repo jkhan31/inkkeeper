@@ -20,7 +20,9 @@ interface Session {
   duration_minutes: number
   book_title: string
   main_reflection: string
+  additional_notes?: string
 }
+
 
 export default function Archive() {
   const { user, loading } = useAuthGuard()

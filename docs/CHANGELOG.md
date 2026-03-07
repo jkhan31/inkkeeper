@@ -13,9 +13,12 @@ Versioning is milestone-based and aligned with architectural phases.
 - **Immediate Session Ending**: Users can now end a reading session at any time. Minimum-time constraints and guardrails (5-minute rule) have been removed to honor the user's intent.
 
 ### Changed
+- **Reflection Page**: Refactored to follow the "Idea-First" hierarchy. The main reflection is now the "hero" element (italic serif), followed by additional notes and a subtle metadata row.
 - **Nomenclature**: "History" has been renamed to "Archive" throughout the entire UI (Dashboard, Navigation, Page Titles, and Documentation).
 - **SessionCard**: Converted into an inline-expandable component. Clicking a card now reveals the full `main_reflection` text without navigating away.
 - **Timer Logic**: Reset to a pure count-up model. "End Session" is active from start. Elapsed time is captured accurately and passed to reflection capture via `sessionStorage`.
+- **Project Stability**: Converted path aliases to relative paths across all core pages and resolved implicit 'any' types for cleaner production builds.
+- **Test Alignment**: Updated Playwright test suite to use the `/archive` route and verified PWA manifest configuration.
 - **Documentation**: `MASTERPLAN.md`, `SCHEMA.md`, `IMPLEMENTATION_PLAN.md`, `PROGRESS_LOG.md`, `README.md`, and `APP_FLOW_PAGES_AND_ROLES.md` updated to reflect the "Quiet Archive" identity and simplified ritual.
 
 ### Removed

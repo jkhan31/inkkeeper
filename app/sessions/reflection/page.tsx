@@ -137,77 +137,82 @@ export default function Log() {
                 <div>
                     <button
                         onClick={() => router.push('/sessions/timer')}
-                        className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors mb-8"
+                        className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors mb-12"
                     >
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
                         </svg>
                         Back
                     </button>
-                    <h1 className="text-2xl font-semibold tracking-tight">Log Session</h1>
-                    <p className="text-sm text-[#1A1A1A]/40 mt-1">
-                        {formatDate(sessionData.startTime)} · {formatDuration(sessionData.durationMinutes)}
-                    </p>
                 </div>
 
                 <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col gap-4">
-                    <div className="bg-white rounded-[2rem] border border-[#1A1A1A]/5 p-6 flex flex-col gap-6">
-                        <div>
-                            <label htmlFor="bookTitle" className="text-xs font-medium text-[#1A1A1A]/40 uppercase tracking-widest mb-2 block">
-                                Book Title *
-                            </label>
-                            <input
-                                id="bookTitle"
-                                type="text"
-                                value={bookTitle}
-                                onChange={(e) => setBookTitle(e.target.value)}
-                                placeholder="Enter book title"
-                                className="w-full border-b border-[#1A1A1A]/10 bg-transparent pb-2 text-[#1A1A1A] placeholder:text-[#1A1A1A]/30 focus:outline-none focus:border-[#8F270D] transition-colors"
-                            />
-                        </div>
-
-                        <div>
-                            <label htmlFor="mainReflection" className="text-xs font-medium text-[#1A1A1A]/40 uppercase tracking-widest mb-2 block">
-                                What stood out most? *
-                            </label>
+                    <div className="bg-white rounded-[2rem] border border-[#1A1A1A]/5 p-8 shadow-sm flex flex-col">
+                        {/* 1. Reflection Text: The Hero */}
+                        <div className="mb-0">
+                            <label htmlFor="mainReflection" className="sr-only">Main Reflection</label>
                             <textarea
                                 id="mainReflection"
                                 value={mainReflection}
                                 onChange={(e) => setMainReflection(e.target.value)}
-                                placeholder="Share your main reflection"
+                                placeholder="What's the one thought that stayed?"
                                 rows={4}
-                                className="w-full bg-transparent resize-none border-b border-[#1A1A1A]/10 pb-2 text-[#1A1A1A] placeholder:text-[#1A1A1A]/30 focus:outline-none focus:border-[#8F270D] transition-colors"
+                                className="w-full bg-transparent resize-none text-xl font-serif italic text-[#1A1A1A] placeholder:text-[#1A1A1A]/20 focus:outline-none leading-relaxed"
                             />
                         </div>
 
-                        <div>
-                            <label htmlFor="additionalNotes" className="text-xs font-medium text-[#1A1A1A]/40 uppercase tracking-widest mb-2 block">
-                                Additional notes
+                        {/* 2. Additional Notes */}
+                        <div className="mt-4 pt-4 border-t border-[#1A1A1A]/5">
+                            <label htmlFor="additionalNotes" className="text-[10px] font-sans text-[#1A1A1A]/30 uppercase tracking-widest mb-2 block">
+                                Additional Notes
                             </label>
                             <textarea
                                 id="additionalNotes"
                                 value={additionalNotes}
                                 onChange={(e) => setAdditionalNotes(e.target.value)}
-                                placeholder="Any other thoughts? (optional)"
+                                placeholder="Any context or citations? (optional)"
                                 rows={3}
-                                className="w-full bg-transparent resize-none text-[#1A1A1A] placeholder:text-[#1A1A1A]/30 focus:outline-none"
+                                className="w-full bg-transparent resize-none text-sm font-sans text-[#1A1A1A]/70 placeholder:text-[#1A1A1A]/20 focus:outline-none leading-relaxed"
                             />
+                        </div>
+
+                        {/* 3. Visual Break: Subtle hairline divider */}
+                        <hr className="border-[#1A1A1A]/5 my-6" />
+
+                        {/* 4. Metadata Row: Book Title (Input) • Date • Duration */}
+                        <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-[#1A1A1A]/40 tracking-widest uppercase">
+                            <div className="flex-1 min-w-[120px]">
+                                <label htmlFor="bookTitle" className="sr-only">Book Title</label>
+                                <input
+                                    id="bookTitle"
+                                    type="text"
+                                    value={bookTitle}
+                                    onChange={(e) => setBookTitle(e.target.value)}
+                                    placeholder="Book Title *"
+                                    className="w-full bg-transparent font-semibold text-[#1A1A1A]/60 placeholder:text-[#1A1A1A]/20 focus:outline-none border-none p-0 h-auto uppercase tracking-widest"
+                                />
+                            </div>
+                            <span>•</span>
+                            <span>{new Date(sessionData.startTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                            <span>•</span>
+                            <span>{sessionData.durationMinutes}m</span>
                         </div>
                     </div>
 
                     {validationError && (
-                        <p className="text-sm text-[#8F270D] text-center">{validationError}</p>
+                        <p className="text-sm text-[#8F270D] text-center my-2">{validationError}</p>
                     )}
 
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="w-full bg-[#8F270D] text-white rounded-full px-4 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                        className="w-full bg-[#8F270D] text-white rounded-full px-4 py-4 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity mt-2"
                     >
-                        {isSaving ? 'Saving...' : 'Save Reflection'}
+                        {isSaving ? 'Saving...' : 'Save to Archive'}
                     </button>
                 </form>
             </div>
         </main>
     )
+
 }
