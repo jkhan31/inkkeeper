@@ -56,12 +56,6 @@ export default function Archive() {
   }
 
   // ─────────────────────────────────────────────────────────
-  // Compute lifetime summary metrics
-  // ─────────────────────────────────────────────────────────
-  const totalSessions = sessions.length
-  const totalMinutes = sessions.reduce((sum: number, session: Session) => sum + (session.duration_minutes || 0), 0)
-
-  // ─────────────────────────────────────────────────────────
   // Render session archive
   // ─────────────────────────────────────────────────────────
   return (
@@ -79,23 +73,7 @@ export default function Archive() {
         </Link>
       </div>
 
-      <h1 className="text-2xl font-semibold tracking-tight">Archive</h1>
-
-      {/* Lifetime Summary */}
-      <div>
-        <h2 className="text-lg font-semibold tracking-tight mb-3">Your Reading Record</h2>
-        <div className="grid grid-cols-2 gap-4 w-full max-w-md">
-          <div className="bg-white border border-[#1A1A1A]/5 rounded-[2rem] p-4">
-            <div className="text-2xl font-semibold">{totalSessions}</div>
-            <div className="text-sm font-medium">Sessions</div>
-          </div>
-          <div className="bg-white border border-[#1A1A1A]/5 rounded-[2rem] p-4">
-            <div className="text-2xl font-semibold">{totalMinutes}</div>
-            <div className="text-sm font-medium">Minutes</div>
-          </div>
-        </div>
-      </div>
-
+      <h1 className="text-2xl font-serif tracking-tight mt-4">Archive</h1>
 
       {/* Session List */}
       <div className="w-full max-w-md">

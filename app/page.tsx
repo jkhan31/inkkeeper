@@ -1,17 +1,17 @@
 'use client'
 
 import { useCallback } from 'react'
-import { Header } from '@/components/landing/Header'
-import { Footer } from '@/components/landing/Footer'
-import { HeroSection } from '@/sections/HeroSection'
-import { ProblemSection } from '@/sections/ProblemSection'
-import { SolutionSection } from '@/sections/SolutionSection'
-import { ValueSection } from '@/sections/ValueSection'
-import { DifferentiationSection } from '@/sections/DifferentiationSection'
-import { FeaturesSection } from '@/sections/FeaturesSection'
-import { TestimonialsSection } from '@/sections/TestimonialsSection'
-import { PricingSection } from '@/sections/PricingSection'
-import { ClosingCTASection } from '@/sections/ClosingCTASection'
+import { Header } from '../components/landing/Header'
+import { Footer } from '../components/landing/Footer'
+import { HeroSection } from '../sections/HeroSection'
+import { ProblemSection } from '../sections/ProblemSection'
+import { SolutionSection } from '../sections/SolutionSection'
+import { ValueSection } from '../sections/ValueSection'
+import { DifferentiationSection } from '../sections/DifferentiationSection'
+import { FeaturesSection } from '../sections/FeaturesSection'
+import { TestimonialsSection } from '../sections/TestimonialsSection'
+import { PricingSection } from '../sections/PricingSection'
+import { ClosingCTASection } from '../sections/ClosingCTASection'
 
 export default function LandingPage() {
   const scrollToSection = useCallback((id: string) => {

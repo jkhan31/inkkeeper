@@ -23,10 +23,10 @@ Stores individual reading sessions per authenticated user.
 |--------|------|----------|---------|-------------|
 | `id` | `uuid` | Yes | `gen_random_uuid()` | Primary key |
 | `user_id` | `uuid` | Yes | — | References `auth.users(id)` |
-| `start_time` | `timestamptz` | Yes | — | Session start timestamp |
-| `end_time` | `timestamptz` | Yes | — | Session end timestamp |
-| `duration_minutes` | `integer` | Yes | — | Must be `>= 0` |
-| `book_title` | `text` | Yes | — | Title of book being read |
+| `start_time` | `timestamptz` | No | — | Session start timestamp |
+| `end_time` | `timestamptz` | No | — | Session end timestamp |
+| `duration_minutes` | `integer` | No | `0` | Reading time in minutes |
+| `book_title` | `text` | No | `'Untitled Source'` | Title of the source |
 | `main_reflection` | `text` | Yes | — | Primary reflection text |
 | `additional_notes` | `text` | No | — | Optional additional notes |
 | `created_at` | `timestamptz` | Yes | `now()` | Record creation time |

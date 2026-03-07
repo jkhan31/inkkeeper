@@ -104,14 +104,14 @@ export default function Active() {
             'inkkeeper_timer_state',
             JSON.stringify({ elapsedAtEnd: totalElapsedMs })
         )
-        const durationMinutes = Math.max(1, Math.floor(totalElapsedMs / 1000 / 60))
+        const durationMinutes = Math.floor(totalElapsedMs / 1000 / 60)
 
         sessionStorage.setItem(
             'inkkeeper_active_session',
             JSON.stringify({ startTime: startTimeRef.current, endTime, durationMinutes })
         )
 
-        router.push('/sessions/reflection')
+        router.push('/session/reflection')
     }
 
     // ─── Abandon Session ──────────────────────────────────────────────────────

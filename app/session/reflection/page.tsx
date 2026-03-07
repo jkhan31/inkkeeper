@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { supabase } from '../../../lib/supabaseClient'
 
 // Temporary format for session data passed through sessionStorage
-// after user ends a session in /sessions/timer
+// after user ends a session in /session/active
 interface SessionData {
     startTime: number
     endTime: number
@@ -80,8 +80,8 @@ export default function Log() {
         if (isSaving) return
 
         // Validate required fields
-        if (!bookTitle.trim() || !mainReflection.trim()) {
-            setValidationError('Please fill in all required fields')
+        if (!mainReflection.trim()) {
+            setValidationError('One thought is required to save.')
             return
         }
 
@@ -133,11 +133,12 @@ export default function Log() {
 
     return (
         <main className="flex min-h-screen flex-col items-center bg-[#FAF5F0] text-[#1A1A1A] pt-10 pb-16 px-6">
-            <div className="w-full max-w-md flex flex-col gap-6">
+            <div className="w-full max-w-md flex flex-col gap-10">
+                {/* Back button */}
                 <div>
                     <button
-                        onClick={() => router.push('/sessions/timer')}
-                        className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors mb-12"
+                        onClick={() => router.push('/session/active')}
+                        className="inline-flex items-center text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors"
                     >
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -146,40 +147,53 @@ export default function Log() {
                     </button>
                 </div>
 
-                <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col gap-4">
-                    <div className="bg-white rounded-[2rem] border border-[#1A1A1A]/5 p-8 shadow-sm flex flex-col">
-                        {/* 1. Reflection Text: The Hero */}
-                        <div className="mb-0">
+                {/* Prompt Heading */}
+                <h1 className="text-3xl font-serif tracking-tight text-center mt-2">
+                    What stood out most?
+                </h1>
+
+                <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col gap-10">
+                    <div className="flex flex-col gap-3">
+                        {/* 1. Reflection Text: The Focal Point */}
+                        <div className="bg-white rounded-[2rem] border border-[#1A1A1A]/10 p-8 shadow-sm">
                             <label htmlFor="mainReflection" className="sr-only">Main Reflection</label>
                             <textarea
                                 id="mainReflection"
+                                autoFocus
                                 value={mainReflection}
                                 onChange={(e) => setMainReflection(e.target.value)}
-                                placeholder="What's the one thought that stayed?"
-                                rows={4}
-                                className="w-full bg-transparent resize-none text-xl font-serif italic text-[#1A1A1A] placeholder:text-[#1A1A1A]/20 focus:outline-none leading-relaxed"
+                                placeholder="Write here..."
+                                rows={6}
+                                className="w-full bg-transparent resize-none text-2xl font-serif text-[#1A1A1A] placeholder:text-[#1A1A1A]/10 focus:outline-none leading-relaxed"
                             />
                         </div>
+                        {/* 1.1 Helper Text */}
+                        <p className="text-center text-xs font-sans text-[#1A1A1A]/30 uppercase tracking-widest">
+                            One sentence is enough.
+                        </p>
+                    </div>
 
-                        {/* 2. Additional Notes */}
-                        <div className="mt-4 pt-4 border-t border-[#1A1A1A]/5">
-                            <label htmlFor="additionalNotes" className="text-[10px] font-sans text-[#1A1A1A]/30 uppercase tracking-widest mb-2 block">
-                                Additional Notes
+                    {/* Optional Fields Container */}
+                    <div className="bg-white rounded-[2rem] border border-[#1A1A1A]/10 p-8 shadow-sm flex flex-col">
+                        {/* 2. Context / Notes */}
+                        <div className="mb-0">
+                            <label htmlFor="additionalNotes" className="text-[10px] font-sans text-[#1A1A1A]/30 uppercase tracking-widest mb-4 block">
+                                Context / Notes
                             </label>
                             <textarea
                                 id="additionalNotes"
                                 value={additionalNotes}
                                 onChange={(e) => setAdditionalNotes(e.target.value)}
-                                placeholder="Any context or citations? (optional)"
+                                placeholder="Any additional context? (optional)"
                                 rows={3}
-                                className="w-full bg-transparent resize-none text-sm font-sans text-[#1A1A1A]/70 placeholder:text-[#1A1A1A]/20 focus:outline-none leading-relaxed"
+                                className="w-full bg-transparent resize-none text-sm font-sans text-[#1A1A1A]/60 placeholder:text-[#1A1A1A]/10 focus:outline-none leading-relaxed"
                             />
                         </div>
 
-                        {/* 3. Visual Break: Subtle hairline divider */}
-                        <hr className="border-[#1A1A1A]/5 my-6" />
+                        {/* Visual Break */}
+                        <hr className="border-[#1A1A1A]/10 my-8" />
 
-                        {/* 4. Metadata Row: Book Title (Input) • Date • Duration */}
+                        {/* 3. Book Title & Meta */}
                         <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-[#1A1A1A]/40 tracking-widest uppercase">
                             <div className="flex-1 min-w-[120px]">
                                 <label htmlFor="bookTitle" className="sr-only">Book Title</label>
@@ -188,8 +202,8 @@ export default function Log() {
                                     type="text"
                                     value={bookTitle}
                                     onChange={(e) => setBookTitle(e.target.value)}
-                                    placeholder="Book Title *"
-                                    className="w-full bg-transparent font-semibold text-[#1A1A1A]/60 placeholder:text-[#1A1A1A]/20 focus:outline-none border-none p-0 h-auto uppercase tracking-widest"
+                                    placeholder="Book Title (Optional)"
+                                    className="w-full bg-transparent text-[#1A1A1A]/60 placeholder:text-[#1A1A1A]/20 focus:outline-none border-none p-0 h-auto uppercase tracking-widest"
                                 />
                             </div>
                             <span>•</span>
@@ -200,15 +214,16 @@ export default function Log() {
                     </div>
 
                     {validationError && (
-                        <p className="text-sm text-[#8F270D] text-center my-2">{validationError}</p>
+                        <p className="text-sm text-[#8F270D] text-center -mt-4">{validationError}</p>
                     )}
 
+                    {/* Primary Action */}
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="w-full bg-[#8F270D] text-white rounded-full px-4 py-4 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity mt-2"
+                        className="w-full bg-[#8F270D] text-white rounded-full px-4 py-5 text-lg font-serif hover:opacity-95 active:scale-[0.98] disabled:opacity-50 transition-all shadow-sm"
                     >
-                        {isSaving ? 'Saving...' : 'Save to Archive'}
+                        {isSaving ? 'Preserving...' : 'Save to Archive'}
                     </button>
                 </form>
             </div>

@@ -4,5 +4,12 @@
   "start_url": "/dashboard",
   "display": "standalone",
   "background_color": "#FAF5F0",
-  "theme_color": "#FAF5F0"
+  "theme_color": "#FAF5F0",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "1024x1024",
+      "type": "image/png"
+    }
+  ]
 }

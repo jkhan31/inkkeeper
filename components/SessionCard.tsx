@@ -36,11 +36,11 @@ export default function SessionCard({ session }: SessionCardProps) {
   return (
     <div
       onClick={() => setIsExpanded(!isExpanded)}
-      className="block bg-white border border-[#1A1A1A]/5 rounded-[2rem] p-8 hover:border-[#1A1A1A]/10 transition-all cursor-pointer shadow-sm overflow-hidden"
+      className="block bg-white border border-[#1A1A1A]/10 rounded-[2rem] p-8 hover:border-[#1A1A1A]/20 transition-all cursor-pointer shadow-sm overflow-hidden"
     >
       {/* 1. Reflection Text: The Hero */}
-      <h3 className={`text-xl font-serif text-[#1A1A1A] leading-relaxed italic transition-all duration-300 ${!isExpanded ? 'line-clamp-2' : ''}`}>
-        "{session.main_reflection}"
+      <h3 className={`text-xl font-serif text-[#1A1A1A] leading-relaxed transition-all duration-300 ${!isExpanded ? 'line-clamp-2' : ''}`}>
+        {session.main_reflection}
       </h3>
 
       {/* Expandable Area: Reveal full thought and notes gracefully */}
@@ -49,21 +49,19 @@ export default function SessionCard({ session }: SessionCardProps) {
       >
         <div className="overflow-hidden">
           {session.additional_notes && (
-            <div className="mt-6 pt-6 border-t border-[#1A1A1A]/5">
-              <p className="text-[#1A1A1A]/70 leading-relaxed font-sans text-sm">
-                {session.additional_notes}
-              </p>
+            <div className="mt-6 pt-6 border-t border-[#1A1A1A]/5 text-sm text-[#1A1A1A]/60 font-sans leading-relaxed">
+              {session.additional_notes}
             </div>
           )}
         </div>
       </div>
 
       {/* 2. Visual Break: Subtle hairline divider */}
-      <hr className="border-[#1A1A1A]/5 my-6" />
+      <hr className="border-[#1A1A1A]/10 my-6" />
 
       {/* 3. Metadata Row: Book Title • Date • Duration */}
       <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-[#1A1A1A]/40 tracking-widest uppercase">
-        <span className="font-semibold text-[#1A1A1A]/60">{session.book_title}</span>
+        <span className="text-[#1A1A1A]/60">{session.book_title}</span>
         <span>•</span>
         <span>{formatDate(session.created_at)}</span>
         {session.duration_minutes && (
