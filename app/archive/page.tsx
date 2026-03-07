@@ -9,9 +9,9 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import { supabase } from '@/lib/supabaseClient'
-import SessionCard from '@/components/SessionCard'
-import { useAuthGuard } from '@/lib/hooks/useAuthGuard'
+import { supabase } from '../../lib/supabaseClient'
+import SessionCard from '../../components/SessionCard'
+import { useAuthGuard } from '../../lib/hooks/useAuthGuard'
 
 // Session shape mirrors the Supabase sessions table structure
 interface Session {
@@ -57,7 +57,7 @@ export default function Archive() {
   // Compute lifetime summary metrics
   // ─────────────────────────────────────────────────────────
   const totalSessions = sessions.length
-  const totalMinutes = sessions.reduce((sum, session) => sum + (session.duration_minutes || 0), 0)
+  const totalMinutes = sessions.reduce((sum: number, session: Session) => sum + (session.duration_minutes || 0), 0)
 
   // ─────────────────────────────────────────────────────────
   // Render session archive
@@ -101,7 +101,7 @@ export default function Archive() {
           <p>No sessions yet.</p>
         ) : (
           <div className="flex flex-col gap-4">
-            {sessions.map((session) => (
+            {sessions.map((session: Session) => (
               <SessionCard key={session.id} session={session} />
             ))}
           </div>

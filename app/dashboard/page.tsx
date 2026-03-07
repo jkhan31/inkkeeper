@@ -3,8 +3,8 @@
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
 import { useRouter } from 'next/navigation'
-import SessionCard from '@/components/SessionCard'
-import { useAuthGuard } from '@/lib/hooks/useAuthGuard'
+import SessionCard from '../../components/SessionCard'
+import { useAuthGuard } from '../../lib/hooks/useAuthGuard'
 
 /**
  * Dashboard: Main landing page after authentication
@@ -63,7 +63,7 @@ export default function Dashboard() {
 
         if (data) {
             setWeeklySessionCount(data.length)
-            const totalMinutes = data.reduce((sum, session) => sum + (session.duration_minutes || 0), 0)
+            const totalMinutes = data.reduce((sum: number, session: any) => sum + (session.duration_minutes || 0), 0)
             setWeeklyMinutesTotal(totalMinutes)
         }
     }, [])

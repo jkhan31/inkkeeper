@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useAuthGuard } from '@/lib/hooks/useAuthGuard'
+import { useAuthGuard } from '../../../lib/hooks/useAuthGuard'
 
 /**
  * Active Session Page

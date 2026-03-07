@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '../../../lib/supabaseClient'
 
 // Temporary format for session data passed through sessionStorage
 // after user ends a session in /sessions/timer
@@ -50,10 +50,10 @@ export default function Log() {
     }
 
     const formatDate = (timestamp: number) => {
-        return new Date(timestamp).toLocaleDateString('en-GB', { 
-            day: 'numeric', 
-            month: 'long', 
-            year: 'numeric' 
+        return new Date(timestamp).toLocaleDateString('en-GB', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
         })
     }
 
@@ -93,7 +93,7 @@ export default function Log() {
         try {
             // Get authenticated user
             const { data: { user }, error: authError } = await supabase.auth.getUser()
-            
+
             if (authError || !user) {
                 console.error('Authentication error:', authError)
                 setIsSaving(false)
@@ -122,7 +122,7 @@ export default function Log() {
             // Clean up temporary storage after successful persist
             sessionStorage.removeItem('inkkeeper_active_session')
             sessionStorage.removeItem('inkkeeper_timer_state')
-            
+
             // Use replace to prevent back-navigation to this page
             router.replace('/dashboard')
         } catch (error) {
