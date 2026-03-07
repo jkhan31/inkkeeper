@@ -9,15 +9,10 @@ import { useAuthGuard } from '@/lib/hooks/useAuthGuard'
  *
  * Runs a reading timer that counts up from 0 seconds.
  * Supports pause/resume to exclude breaks during a reading session.
- * Requires minimum 5 minutes before ending the session.
  */
 export default function Active() {
     const router = useRouter()
     const { loading } = useAuthGuard()
-
-    // ─── Session Configuration ────────────────────────────────────────────────
-
-    const minimumSessionSeconds = 5 // * 60 // 5 minutes, 5 seconds for testing
 
     // ─── Time Tracking (refs to avoid re-render on every calculation) ─────────
 
@@ -131,7 +126,6 @@ export default function Active() {
     // ─── Display Logic ────────────────────────────────────────────────────────
 
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
-    const canEndSession = elapsedSeconds >= minimumSessionSeconds
 
     if (loading) return <main className="min-h-screen bg-[#FAF5F0]" />
 
@@ -176,7 +170,6 @@ export default function Active() {
 
                         <button
                             onClick={handleEnd}
-                            disabled={!canEndSession}
                             className="bg-[#8F270D] text-white rounded-full px-6 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
                         >
                             End Session

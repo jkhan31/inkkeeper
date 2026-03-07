@@ -7,14 +7,11 @@ Completed:
 - Phase 1 — Core Loop Skeleton
 - Phase 2 — Timer Integrity
 - Phase 3 — Persistence (Insert)
-- Phase 4 — History (Basic List)
+- Phase 4 — Archive (Basic List)
 
 Pending to honor original v0.1 definition:
 - Dashboard totals (Total + Weekly)
-- Duration progression system
-- Duration memory (UserPreferences)
-- 4-minute subtle nudge
-- Inline history expansion
+- Inline archive expansion
 - Visual system enforcement
 - PWA install verification
 
@@ -60,22 +57,19 @@ Build static UI first.
 Never trust UI counter.
 
 Implement:
-
-- 5-minute guardrail
-- 4-minute subtle nudge
+- Immediate session ending
+- Accurate duration capture
 
 ---
 
 ## Phase 3 — Persistence
 
 - Insert session on save
-- Calculate totals server-side
 - Weekly stats = rolling 7 days
-- Sync last_selected_duration
 
 ---
 
-## Phase 4 — History
+## Phase 4 — Archive
 
 - Reverse chronological list
 - Expand inline

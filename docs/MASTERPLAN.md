@@ -79,12 +79,14 @@ People who:
 
 ### Dashboard
 
+### Dashboard
+
 - Total Sessions  
 - Total Minutes  
 - Weekly Sessions  
 - Weekly Minutes  
 - Begin Session (primary CTA)  
-- View History  
+- Archive  
 
 ---
 
@@ -96,32 +98,17 @@ No feature may interrupt this loop.
 
 ---
 
-### Duration System
+---
 
-First 3 sessions:
-- 10 / 15 / 20 minutes
-- Explicit confirmation required
+## Session Logic
 
-After 3 sessions:
-- 5–60 minutes (5-min increments)
-- Opens centered on last selected duration
-
-No unlock messaging.
+- Immediate session ending supported.
+- Duration calculated from timestamps (excluding pauses).
+- All sessions are eligible for reflection.
 
 ---
 
-### Logging Guardrail
-
-- <5 minutes → End (not saved)
-- 4–5 minutes → Confirmation sheet
-- ≥5 minutes → Save available
-
-Paused time excluded.
-Duration calculated from timestamps.
-
----
-
-### History Ledger
+### Archive Ledger
 
 Reverse chronological:
 
@@ -161,10 +148,6 @@ Deployment: Installable PWA
 - duration_minutes
 - created_at
 
-### UserPreferences
-- user_id
-- last_selected_duration
-
 ---
 
 ## Definition of v0.1 Complete
@@ -175,7 +158,6 @@ Deployment: Installable PWA
 - 5-min guardrail enforced
 - Totals correct
 - Weekly stats correct
-- History renders
-- Duration memory syncs
+- Archive renders
 - PWA installs
 - Used personally for 3 sessions

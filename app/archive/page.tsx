@@ -1,5 +1,5 @@
 /**
- * History Page
+ * Archive Page
  * 
  * Displays a read-only chronological list of the user's completed reading sessions.
  * Authentication-gated: redirects to login if user is not authenticated.
@@ -22,7 +22,7 @@ interface Session {
   main_reflection: string
 }
 
-export default function History() {
+export default function Archive() {
   const { user, loading } = useAuthGuard()
   const [sessions, setSessions] = useState<Session[]>([])
   const [dataLoading, setDataLoading] = useState(false)
@@ -60,7 +60,7 @@ export default function History() {
   const totalMinutes = sessions.reduce((sum, session) => sum + (session.duration_minutes || 0), 0)
 
   // ─────────────────────────────────────────────────────────
-  // Render session history
+  // Render session archive
   // ─────────────────────────────────────────────────────────
   return (
     <main className="flex min-h-screen flex-col items-center gap-8 pt-8 pb-16 bg-[#FAF5F0] text-[#1A1A1A]">
@@ -77,7 +77,7 @@ export default function History() {
         </Link>
       </div>
 
-      <h1 className="text-2xl font-semibold tracking-tight">History</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">Archive</h1>
 
       {/* Lifetime Summary */}
       <div>

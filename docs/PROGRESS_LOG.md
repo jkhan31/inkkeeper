@@ -128,10 +128,48 @@
 
 ### Alignment Check
 
-Sacred loop is stable. Duration system, dashboard aggregation, and history summary are complete.
+---
 
-Remaining v0.1 items (see Master Plan):
+## 2026-03-07 — Strategic Simplification: Pure Count-Up Timer
 
-- Duration memory (UserPreferences)
-- Inline expandable history
-- 4-minute guardrail confirmation
+### Completed
+
+- Documentation audited and aligned: `MASTERPLAN.md`, `SCHEMA.md`, and `IMPLEMENTATION_PLAN.md` updated to remove duration systems and `UserPreferences`.
+- Core loop confirmed as a pure count-up timer: Dashboard → Timer (Count-up) → Reflection → History.
+
+### Decisions
+
+- Duration selection and progression systems removed — InkKeeper is about the *act* of reading, not hitting a pre-selected target.
+- `UserPreferences` table scrapped — without duration goals or configuration-heavy features, local and auth state is sufficient for v0.1.
+
+### Notes
+
+- Inline history expansion still not implemented
+- 4-minute guardrail confirmation still not implemented
+
+---
+
+---
+
+## 2026-03-07 — Timer & Archive Refactor: "The Quiet Archive"
+
+### Completed
+
+- Timer simplification: Removed all minimum-time constraints. Users can now end a session immediately from the moment it starts.
+- "End Session" button functionality: Now always active and clickable.
+- SessionCard refactor: Converted into an inline-expandable component. Full reflection text is now toggled directly within the card with a smooth height transition.
+- Label update: Renamed "History" to "Archive" throughout the entire UI (Dashboard, Header, Archive/History page, JSDoc, and documentation).
+- Data flow verification: Confirmed "End Session" correctly captures elapsed time and triggers the transition to the reflection capture screen.
+
+### Decisions
+
+- "Archive" as the final nomenclature: Replaces "History" to reinforce the project's identity as a place of preservation and rediscovery.
+- Removal of 5-minute guardrail and 4-minute nudge: Aligns with the "Strategic Simplification" and "Pure Count-Up Timer" pivots — the app should not judge the length of a ritual.
+
+### Alignment Check (v0.1)
+
+- Sacred loop is stable and friction-light.
+- Archive provides immediate access to reflections without page navigation.
+- Minimum duration constraints removed to honor the user's intent.
+
+v0.1 core features are now functionally complete.

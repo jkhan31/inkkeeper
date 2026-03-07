@@ -9,7 +9,7 @@ import { useAuthGuard } from '@/lib/hooks/useAuthGuard'
 /**
  * Dashboard: Main landing page after authentication
  * 
- * Serves as the central hub for navigating to session creation and history.
+ * Serves as the central hub for navigating to session creation and archive.
  * Implements auth gate pattern - redirects to login if no active session.
  */
 
@@ -34,33 +34,33 @@ export default function Dashboard() {
         const now = new Date()
         const dayOfWeek = now.getDay()
         const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek // Monday = 1, Sunday = 0
-        
+
         const monday = new Date(now)
         monday.setDate(now.getDate() + diff)
         monday.setHours(0, 0, 0, 0)
-        
+
         const sunday = new Date(monday)
         sunday.setDate(monday.getDate() + 6)
         sunday.setHours(23, 59, 59, 999)
-        
+
         return { start: monday, end: sunday }
     }
 
     // Fetch weekly metrics from sessions table
     const fetchWeeklyMetrics = useCallback(async () => {
         const { start, end } = getWeekBounds()
-        
+
         const { data, error } = await supabase
             .from('sessions')
             .select('id, duration_minutes, created_at')
             .gte('created_at', start.toISOString())
             .lte('created_at', end.toISOString())
-        
+
         if (error) {
             console.error('Error fetching sessions:', error)
             return
         }
-        
+
         if (data) {
             setWeeklySessionCount(data.length)
             const totalMinutes = data.reduce((sum, session) => sum + (session.duration_minutes || 0), 0)
@@ -75,12 +75,12 @@ export default function Dashboard() {
             .select('id, created_at, duration_minutes, book_title, main_reflection')
             .order('created_at', { ascending: false })
             .limit(3)
-        
+
         if (error) {
             console.error('Error fetching recent sessions:', error)
             return
         }
-        
+
         if (data) {
             setRecentSessions(data)
         }
@@ -125,7 +125,7 @@ export default function Dashboard() {
 
             {/* Main content - centered */}
             <div className="flex flex-col items-center gap-8 w-full max-w-md mx-auto px-8">
-                
+
                 {/* Weekly Metrics Summary */}
                 <div className="w-full">
                     <h3 className="text-sm font-medium mb-3 opacity-60">This Week</h3>
@@ -155,10 +155,10 @@ export default function Dashboard() {
                         <div className="flex justify-between items-center mb-3">
                             <h3 className="text-sm font-medium opacity-60">Recent Sessions</h3>
                             <button
-                                onClick={() => router.push('/history')}
+                                onClick={() => router.push('/archive')}
                                 className="text-xs opacity-60 hover:opacity-100 underline"
                             >
-                                View All
+                                Archive
                             </button>
                         </div>
                         <div className="flex flex-col gap-3">

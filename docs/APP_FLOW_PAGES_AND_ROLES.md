@@ -4,10 +4,9 @@
 
 /login  
 /dashboard  
-/sessions/setup  
 /sessions/timer  
 /sessions/reflection  
-/history  
+/archive  
 
 ---
 
@@ -19,16 +18,13 @@ Authenticate via Magic Link.
 /dashboard  
 Practice overview + entry point.
 
-/sessions/setup  
-Select duration deliberately.
-
 /sessions/timer  
 Focused reading container.
 
 /sessions/reflection  
 Record book + optional reflection.
 
-/history  
+/archive  
 Ledger of sessions.
 
 ---
@@ -42,7 +38,7 @@ Permissions:
 - Pause
 - End
 - Save
-- View history
+- View archive
 - Logout
 
 No admin.
@@ -54,16 +50,16 @@ No social features.
 ## Primary Journeys
 
 Start Session:
-Dashboard → Setup → Active
+Dashboard → Timer
 
 Complete Session:
-Active → Log → Dashboard
+Timer → Reflection → Dashboard
 
 End Early:
-Active → Dashboard
+Timer → Dashboard
 
-Review History:
-Dashboard → History
+Review Archive:
+Dashboard → Archive
 
 ---
 
@@ -71,10 +67,10 @@ Dashboard → History
 
 No:
 - Editing sessions
-- Starting from history
+- Starting from archive
 - Viewing totals during session
 - Interruptive modals
 
-Sacred loop:
+v0.1 Sacred loop:
 
-Dashboard → Setup → Active → Log → Return
+Dashboard → Timer → Reflection → Return

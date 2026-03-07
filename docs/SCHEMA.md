@@ -86,13 +86,3 @@ CREATE TABLE public.sessions (
 );
 ```
 
-### Planned Tables (Not Yet Implemented)
-Table: user_preferences (Planned)
-Purpose: Store ritual configuration per user.
-
-#### Planned Columns
-| Column | Type | Required | Description |
-|--------|------|----------|-------------|
-| `user_id` | `uuid` | Yes | FK to `auth.users(id)` |
-| `last_selected_duration` | `integer` | Yes | Last ritual duration in minutes |
-Status: Not implemented

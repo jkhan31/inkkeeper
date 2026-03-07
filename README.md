@@ -6,7 +6,7 @@ InkKeeper is not a productivity tool.
 It is not a habit tracker.  
 It does not gamify reading.
 
-It provides a structured, time-bound container for deliberate reading sessions and long-term accumulation.
+It provides a structured, count-up container for deliberate reading sessions and long-term accumulation.
 
 ---
 
@@ -31,7 +31,7 @@ The system reinforces practice, not performance.
 ---
 
 ## Core User Flow
-Dashboard → Setup → Active Session → Log → Return
+Dashboard → Timer → Reflection → Return (Archive)
 
 This loop is protected.  
 No feature may interrupt or branch it.
@@ -46,11 +46,10 @@ No feature may interrupt or branch it.
 - Row-level security enforced per user
 
 ### Session Lifecycle
-- User selects a fixed duration
-- Timestamp-based timer (start_time / end_time)
+- Pure count-up timer starting from 00:00:00
+- Timestamp-based duration calculation (start_time / end_time)
 - Pause duration explicitly excluded
-- 5-minute logging guardrail enforced
-- 4-minute subtle continuation nudge
+- Immediate session ending supported (no minimum duration)
 
 ### Practice Tracking
 - Total Sessions
@@ -58,26 +57,11 @@ No feature may interrupt or branch it.
 - Weekly Sessions (rolling 7 days)
 - Weekly Minutes
 
-### Ledger
-- Reverse chronological session history
-- Inline expansion
+### Archive
+- Reverse chronological session ledger
+- Inline expansion of reflections
 - No editing
 - No analytics views
-
----
-
-## Duration Model
-
-First 3 sessions:
-- 10 / 15 / 20 minutes
-
-After 3 logged sessions:
-- 5–60 minutes in 5-minute increments
-- Opens centered on last selected duration
-
-No unlock messaging.
-
-Expansion is structural, not emotional.
 
 ---
 
@@ -109,15 +93,11 @@ Expansion is structural, not emotional.
 - id (uuid)
 - user_id (FK)
 - book_title
-- note
+- main_reflection
 - start_time
 - end_time
 - duration_minutes
 - created_at
-
-**UserPreferences**
-- user_id
-- last_selected_duration
 
 ---
 
@@ -127,12 +107,6 @@ Duration is calculated from timestamps:
 duration = end_time - start_time - paused_duration
 
 The UI counter is not trusted.
-
-Rules:
-
-- <5 minutes → session not saved
-- 4–5 minutes → confirmation required
-- ≥5 minutes → save enabled
 
 Paused time is explicitly excluded from persistence.
 
@@ -181,10 +155,7 @@ The following are explicitly excluded:
 - Authentication stable
 - Session persistence reliable
 - Timer mathematically accurate
-- 5-minute guardrail enforced
-- Totals calculated correctly
-- Weekly stats correct
-- History renders accurately
+- Archive renders accurately with inline expansion
 - PWA installable
 - Personally used for at least 3 sessions
 
