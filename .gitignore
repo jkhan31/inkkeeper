@@ -46,3 +46,7 @@ yarn-error.log*
 # vercel/netlify
 .vercel
 .netlify
+
+# Playwright
+node_modules/
+/playwright/.auth/
