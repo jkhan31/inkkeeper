@@ -36,12 +36,12 @@ export default function ForgotPassword() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A]">
+        <main className="flex min-h-screen flex-col bg-rice-paper text-sumi-ink">
             {/* Back button */}
             <div className="px-6 pt-8">
                 <button
                     onClick={() => router.push('/login')}
-                    className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors"
+                    className="inline-flex items-center text-sumi-ink/50 hover:text-sumi-ink transition-colors rounded-full"
                 >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -54,7 +54,7 @@ export default function ForgotPassword() {
                 <div className="flex flex-col gap-4 w-80">
                     <h1 className="text-2xl font-bold text-center tracking-tight mb-2">Reset Password</h1>
 
-                    <p className="text-sm text-center text-[#1A1A1A]/40">
+                    <p className="text-sm text-center text-sumi-ink/40">
                         Enter your email and we&apos;ll send you a link to reset your password.
                     </p>
 
@@ -63,20 +63,20 @@ export default function ForgotPassword() {
                         placeholder="Enter your email"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="border border-[#1A1A1A]/20 rounded-lg px-4 py-2.5 bg-white text-[#1A1A1A] placeholder:text-[#1A1A1A]/40 focus:outline-none focus:border-[#8F270D] transition-colors"
+                        className="ink-input"
                         disabled={success}
                     />
 
                     <button
                         onClick={handleSubmit}
                         disabled={loading || success}
-                        className="bg-[#8F270D] text-white rounded-full px-4 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                        className="btn-primary w-full !py-2.5 text-sm font-medium"
                     >
                         {loading ? 'Sending...' : 'Send Reset Link'}
                     </button>
 
                     {message && (
-                        <p className={`text-sm text-center ${success ? 'text-[#1A1A1A]/60' : 'text-[#8F270D]'}`}>
+                        <p className={`text-sm text-center ${success ? 'text-sumi-ink/60' : 'text-seal-rust'}`}>
                             {message}
                         </p>
                     )}

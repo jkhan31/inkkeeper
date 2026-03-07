@@ -31,7 +31,7 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="relative min-h-screen selection:bg-deep-moss/10">
+    <div className="relative min-h-screen selection:bg-seal-rust/10">
       {/* Visual Texture */}
       <div className="grain-overlay" />
 

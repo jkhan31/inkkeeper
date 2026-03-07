@@ -11,6 +11,10 @@
   --color-sage: #4D6B57;
   /* Subtle States */
 
+  /* Semantic Colors */
+  --color-ink-surface: rgba(255, 255, 255, 0.4);
+  --color-ink-border: rgba(26, 26, 26, 0.1);
+
   /* Soft Geometry */
   --radius-ink-card: 2rem;
   /* Manifesto requirement */
@@ -24,7 +28,7 @@
 
 @layer base {
   body {
-    @apply bg-rice-paper text-sumi-ink antialiased selection:bg-seal-rust/10;
+    @apply bg-rice-paper text-sumi-ink antialiased selection:bg-seal-rust/20;
     font-feature-settings: "ss01", "ss02", "cv01";
   }
 
@@ -49,10 +53,18 @@
 
 @layer components {
   .btn-primary {
-    @apply bg-seal-rust text-rice-paper px-8 py-4 rounded-ink-btn font-bold hover:opacity-90 active:scale-[0.98] transition-all inline-block;
+    @apply bg-seal-rust text-rice-paper px-8 py-4 rounded-ink-btn font-bold hover:opacity-90 active:scale-[0.98] transition-all inline-block text-center;
+  }
+
+  .btn-secondary {
+    @apply border border-sumi-ink/10 text-sumi-ink/60 px-8 py-4 rounded-ink-btn font-medium hover:bg-white/50 hover:text-sumi-ink transition-all inline-block text-center;
   }
 
   .ink-card {
-    @apply bg-white/40 backdrop-blur-sm rounded-ink-card border border-sumi-ink/5 p-8;
+    @apply bg-ink-surface backdrop-blur-sm rounded-ink-card border border-ink-border p-8 shadow-sm hover:border-sumi-ink/20 transition-all;
+  }
+
+  .ink-input {
+    @apply bg-white/60 border border-ink-border rounded-xl px-4 py-3 text-sumi-ink placeholder:text-sumi-ink/30 focus:outline-none focus:border-seal-rust/40 transition-colors;
   }
 }

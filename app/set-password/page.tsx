@@ -29,7 +29,7 @@ export default function SetPassword() {
         handleSession()
 
         // Listen for the recovery event specifically
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((event: string) => {
             if (event === 'PASSWORD_RECOVERY') {
                 setIsRecoveryMode(true)
             }
@@ -70,11 +70,11 @@ export default function SetPassword() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A]">
+        <main className="flex min-h-screen flex-col bg-rice-paper text-sumi-ink">
             <div className="px-6 pt-8">
                 <button
                     onClick={() => router.push('/dashboard')}
-                    className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors"
+                    className="inline-flex items-center text-sumi-ink/50 hover:text-sumi-ink transition-colors rounded-full"
                 >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -89,7 +89,7 @@ export default function SetPassword() {
                         {isRecoveryMode ? 'Create New Password' : 'Set Account Password'}
                     </h1>
 
-                    <p className="text-sm text-center text-[#1A1A1A]/60 mb-2">
+                    <p className="text-sm text-center text-sumi-ink/60 mb-2">
                         {isRecoveryMode
                             ? "Enter a new password to regain access to your archive."
                             : "Secure your archive with a password."}
@@ -100,7 +100,7 @@ export default function SetPassword() {
                         placeholder="New password"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="border border-[#1A1A1A]/20 rounded-lg px-4 py-2.5 bg-white text-[#1A1A1A] placeholder:text-[#1A1A1A]/40 focus:outline-none focus:border-[#8F270D] transition-colors"
+                        className="ink-input"
                     />
 
                     <input
@@ -108,19 +108,19 @@ export default function SetPassword() {
                         placeholder="Confirm new password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="border border-[#1A1A1A]/20 rounded-lg px-4 py-2.5 bg-white text-[#1A1A1A] placeholder:text-[#1A1A1A]/40 focus:outline-none focus:border-[#8F270D] transition-colors"
+                        className="ink-input"
                     />
 
                     <button
                         onClick={handleSubmit}
                         disabled={loading}
-                        className="bg-[#8F270D] text-white rounded-full px-4 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity mt-2"
+                        className="btn-primary w-full !py-2.5 text-sm font-medium mt-2"
                     >
                         {loading ? 'Updating...' : 'Update Password'}
                     </button>
 
                     {message && (
-                        <p className="text-sm text-center text-[#8F270D] animate-pulse">{message}</p>
+                        <p className="text-sm text-center text-seal-rust animate-pulse">{message}</p>
                     )}
                 </div>
             </div>

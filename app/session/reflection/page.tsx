@@ -132,13 +132,13 @@ export default function Log() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center bg-[#FAF5F0] text-[#1A1A1A] pt-10 pb-16 px-6">
+        <main className="flex min-h-screen flex-col items-center bg-rice-paper text-sumi-ink pt-10 pb-16 px-6">
             <div className="w-full max-w-md flex flex-col gap-10">
                 {/* Back button */}
                 <div>
                     <button
                         onClick={() => router.push('/session/active')}
-                        className="inline-flex items-center text-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors"
+                        className="inline-flex items-center text-sumi-ink/40 hover:text-sumi-ink transition-colors rounded-full"
                     >
                         <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -155,7 +155,7 @@ export default function Log() {
                 <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col gap-10">
                     <div className="flex flex-col gap-3">
                         {/* 1. Reflection Text: The Focal Point */}
-                        <div className="bg-white rounded-[2rem] border border-[#1A1A1A]/10 p-8 shadow-sm">
+                        <div className="ink-card !p-8">
                             <label htmlFor="mainReflection" className="sr-only">Main Reflection</label>
                             <textarea
                                 id="mainReflection"
@@ -164,20 +164,20 @@ export default function Log() {
                                 onChange={(e) => setMainReflection(e.target.value)}
                                 placeholder="Write here..."
                                 rows={6}
-                                className="w-full bg-transparent resize-none text-2xl font-serif text-[#1A1A1A] placeholder:text-[#1A1A1A]/10 focus:outline-none leading-relaxed"
+                                className="w-full bg-transparent resize-none text-2xl font-serif text-sumi-ink placeholder:text-sumi-ink/10 focus:outline-none leading-relaxed"
                             />
                         </div>
                         {/* 1.1 Helper Text */}
-                        <p className="text-center text-xs font-sans text-[#1A1A1A]/30 uppercase tracking-widest">
+                        <p className="text-center text-xs font-sans text-sumi-ink/30 uppercase tracking-widest">
                             One sentence is enough.
                         </p>
                     </div>
 
                     {/* Optional Fields Container */}
-                    <div className="bg-white rounded-[2rem] border border-[#1A1A1A]/10 p-8 shadow-sm flex flex-col">
+                    <div className="ink-card !p-8 flex flex-col">
                         {/* 2. Context / Notes */}
                         <div className="mb-0">
-                            <label htmlFor="additionalNotes" className="text-[10px] font-sans text-[#1A1A1A]/30 uppercase tracking-widest mb-4 block">
+                            <label htmlFor="additionalNotes" className="text-[10px] font-sans text-sumi-ink/30 uppercase tracking-widest mb-4 block">
                                 Context / Notes
                             </label>
                             <textarea
@@ -186,15 +186,15 @@ export default function Log() {
                                 onChange={(e) => setAdditionalNotes(e.target.value)}
                                 placeholder="Any additional context? (optional)"
                                 rows={3}
-                                className="w-full bg-transparent resize-none text-sm font-sans text-[#1A1A1A]/60 placeholder:text-[#1A1A1A]/10 focus:outline-none leading-relaxed"
+                                className="w-full bg-transparent resize-none text-sm font-sans text-sumi-ink/60 placeholder:text-sumi-ink/10 focus:outline-none leading-relaxed"
                             />
                         </div>
 
                         {/* Visual Break */}
-                        <hr className="border-[#1A1A1A]/10 my-8" />
+                        <hr className="border-sumi-ink/10 my-8" />
 
                         {/* 3. Book Title & Meta */}
-                        <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-[#1A1A1A]/40 tracking-widest uppercase">
+                        <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-sumi-ink/40 tracking-widest uppercase">
                             <div className="flex-1 min-w-[120px]">
                                 <label htmlFor="bookTitle" className="sr-only">Book Title</label>
                                 <input
@@ -203,7 +203,7 @@ export default function Log() {
                                     value={bookTitle}
                                     onChange={(e) => setBookTitle(e.target.value)}
                                     placeholder="Book Title (Optional)"
-                                    className="w-full bg-transparent text-[#1A1A1A]/60 placeholder:text-[#1A1A1A]/20 focus:outline-none border-none p-0 h-auto uppercase tracking-widest"
+                                    className="w-full bg-transparent text-sumi-ink/60 placeholder:text-sumi-ink/20 focus:outline-none border-none p-0 h-auto uppercase tracking-widest"
                                 />
                             </div>
                             <span>•</span>
@@ -214,14 +214,14 @@ export default function Log() {
                     </div>
 
                     {validationError && (
-                        <p className="text-sm text-[#8F270D] text-center -mt-4">{validationError}</p>
+                        <p className="text-sm text-seal-rust text-center -mt-4">{validationError}</p>
                     )}
 
                     {/* Primary Action */}
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="w-full bg-[#8F270D] text-white rounded-full px-4 py-5 text-lg font-serif hover:opacity-95 active:scale-[0.98] disabled:opacity-50 transition-all shadow-sm"
+                        className="btn-primary w-full !py-5 text-lg font-serif disabled:opacity-50"
                     >
                         {isSaving ? 'Preserving...' : 'Save to Archive'}
                     </button>

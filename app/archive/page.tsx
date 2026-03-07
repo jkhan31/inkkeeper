@@ -17,8 +17,9 @@ import { useAuthGuard } from '../../lib/hooks/useAuthGuard'
 interface Session {
   id: string
   created_at: string
-  duration_minutes: number
-  book_title: string
+  duration_minutes: number | null
+  end_time: string | null
+  book_title: string | null
   main_reflection: string
   additional_notes?: string
 }
@@ -52,19 +53,19 @@ export default function Archive() {
 
   // Prevent layout shift while auth check and data fetch resolve
   if (loading || dataLoading) {
-    return <main className="min-h-screen bg-[#FAF5F0]" />
+    return <main className="min-h-screen bg-rice-paper" />
   }
 
   // ─────────────────────────────────────────────────────────
   // Render session archive
   // ─────────────────────────────────────────────────────────
   return (
-    <main className="flex min-h-screen flex-col items-center gap-8 pt-8 pb-16 bg-[#FAF5F0] text-[#1A1A1A]">
+    <main className="flex min-h-screen flex-col items-center gap-8 pt-8 pb-16 bg-rice-paper text-sumi-ink">
       {/* Back button */}
       <div className="w-full max-w-md px-8">
         <Link
           href="/dashboard"
-          className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors"
+          className="inline-flex items-center text-sumi-ink/50 hover:text-sumi-ink transition-colors rounded-full"
         >
           <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />

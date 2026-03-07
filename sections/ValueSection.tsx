@@ -10,18 +10,19 @@ export function ValueSection() {
     ]
 
     return (
-        <section className="py-24 px-6 lg:px-10 bg-rice-paper">
+        <section className="py-32 px-6 lg:px-10 bg-rice-paper">
             <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row gap-16 items-center">
                 <div className="lg:w-1/2 space-y-4 w-full">
                     {sessions.map((s, i) => (
-                        <div key={i} className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-sumi-ink/5 shadow-sm">
-                            <BookOpen size={18} className="text-deep-moss" />
+                        <div key={i} className="ink-card !p-4 flex items-center gap-4">
+                            <BookOpen size={18} className="text-seal-rust" />
                             <div className="flex-1">
                                 <p className="font-bold text-sumi-ink">{s.title}</p>
-                                <p className="text-xs text-muted-sage">{s.date}</p>
+                                <p className="text-[10px] font-bold uppercase tracking-widest text-sumi-ink/40">{s.date}</p>
                             </div>
                         </div>
                     ))}
+
                 </div>
                 <div className="lg:w-1/2 space-y-6">
                     <h2 className="text-4xl font-serif font-bold text-sumi-ink">Build Your Quiet Archive.</h2>

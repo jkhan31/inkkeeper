@@ -19,8 +19,9 @@ import { useAuthGuard } from '../../lib/hooks/useAuthGuard'
 interface Session {
     id: string
     created_at: string
-    duration_minutes: number
-    book_title: string
+    duration_minutes: number | null
+    end_time: string | null
+    book_title: string | null
     main_reflection: string
     additional_notes?: string
 }
@@ -63,10 +64,10 @@ export default function Dashboard() {
     }
 
     // Prevent layout shift while auth check resolves
-    if (loading) return <main className="min-h-screen bg-[#FAF5F0]" />
+    if (loading) return <main className="min-h-screen bg-rice-paper" />
 
     return (
-        <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A] pt-12 pb-16">
+        <main className="flex min-h-screen flex-col bg-rice-paper text-sumi-ink pt-12 pb-16">
             {/* Header - quiet */}
             <header className="w-full max-w-md mx-auto px-8 mb-16">
                 <h2 className="text-2xl font-serif tracking-tight text-center">InkKeeper</h2>
@@ -78,7 +79,7 @@ export default function Dashboard() {
                 {/* Primary Action: Start Session */}
                 <button
                     onClick={() => router.push('/session/active')}
-                    className="w-full bg-[#8F270D] text-white rounded-full px-8 py-5 text-xl font-serif hover:opacity-95 active:scale-[0.99] transition-all shadow-sm"
+                    className="btn-primary w-full !py-5 text-xl font-serif"
                 >
                     [ Start Reading Session ]
                 </button>

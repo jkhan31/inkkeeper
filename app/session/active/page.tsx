@@ -127,15 +127,15 @@ export default function Active() {
 
     const elapsedSeconds = Math.floor(elapsedTime / 1000)
 
-    if (loading) return <main className="min-h-screen bg-[#FAF5F0]" />
+    if (loading) return <main className="min-h-screen bg-rice-paper" />
 
     return (
-        <main className="flex min-h-screen flex-col bg-[#FAF5F0] text-[#1A1A1A]">
+        <main className="flex min-h-screen flex-col bg-rice-paper text-sumi-ink">
             {/* Back button */}
             <div className="px-6 pt-8">
                 <button
                     onClick={() => setShowBackConfirm(true)}
-                    className="inline-flex items-center text-[#1A1A1A]/50 hover:text-[#1A1A1A] transition-colors"
+                    className="inline-flex items-center text-sumi-ink/50 hover:text-sumi-ink transition-colors"
                 >
                     <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
@@ -147,7 +147,7 @@ export default function Active() {
             {/* Timer content — centred in remaining space */}
             <div className="flex-1 flex flex-col items-center justify-center">
                 <div className="flex flex-col items-center gap-8">
-                    <p className="text-xs font-medium tracking-widest uppercase text-[#1A1A1A]/40">
+                    <p className="text-xs font-medium tracking-widest uppercase text-sumi-ink/40">
                         Active Session
                     </p>
 
@@ -156,21 +156,21 @@ export default function Active() {
                             {formatTime(elapsedSeconds)}
                         </span>
                         {isPaused && (
-                            <span className="text-sm text-[#1A1A1A]/40 tracking-wide">Paused</span>
+                            <span className="text-sm text-sumi-ink/40 tracking-wide">Paused</span>
                         )}
                     </div>
 
                     <div className="flex gap-3">
                         <button
                             onClick={handlePauseResume}
-                            className="border border-[#1A1A1A]/20 text-[#1A1A1A]/60 rounded-full px-6 py-2.5 font-medium hover:border-[#8F270D] hover:text-[#8F270D] transition-colors"
+                            className="btn-secondary !px-6 !py-2.5 !text-sm"
                         >
                             {isPaused ? 'Resume' : 'Pause'}
                         </button>
 
                         <button
                             onClick={handleEnd}
-                            className="bg-[#8F270D] text-white rounded-full px-6 py-2.5 font-medium hover:opacity-90 disabled:opacity-50 transition-opacity"
+                            className="btn-primary !px-6 !py-2.5 !text-sm"
                         >
                             End Session
                         </button>
@@ -180,24 +180,24 @@ export default function Active() {
 
             {/* Abandon confirmation modal */}
             {showBackConfirm && (
-                <div className="fixed inset-0 bg-[#1A1A1A]/40 flex items-center justify-center px-6">
-                    <div className="bg-[#FAF5F0] rounded-[2rem] p-8 w-full max-w-sm flex flex-col gap-6">
+                <div className="fixed inset-0 bg-sumi-ink/40 backdrop-blur-sm flex items-center justify-center px-6 z-50">
+                    <div className="ink-card !p-8 w-full max-w-sm flex flex-col gap-6 !bg-rice-paper">
                         <div>
-                            <h2 className="text-lg font-semibold tracking-tight">Leave this session?</h2>
-                            <p className="text-sm text-[#1A1A1A]/50 mt-2">
+                            <h2 className="text-lg font-bold tracking-tight text-sumi-ink">Leave this session?</h2>
+                            <p className="text-sm text-sumi-ink/50 mt-2">
                                 Your progress will not be saved.
                             </p>
                         </div>
                         <div className="flex flex-col gap-3">
                             <button
                                 onClick={() => setShowBackConfirm(false)}
-                                className="w-full bg-[#8F270D] text-white rounded-full py-2.5 font-medium hover:opacity-90 transition-opacity"
+                                className="btn-primary w-full !py-2.5 !text-sm"
                             >
                                 Keep Reading
                             </button>
                             <button
                                 onClick={handleAbandon}
-                                className="w-full border border-[#1A1A1A]/20 text-[#1A1A1A]/60 rounded-full py-2.5 font-medium hover:border-[#1A1A1A]/40 hover:text-[#1A1A1A] transition-colors"
+                                className="btn-secondary w-full !py-2.5 !text-sm"
                             >
                                 Leave Without Saving
                             </button>

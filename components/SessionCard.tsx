@@ -6,10 +6,10 @@ interface SessionCardProps {
   session: {
     id: string;
     created_at: string;
-    book_title: string;
+    book_title: string | null;
     main_reflection: string;
-    duration_minutes?: number;
-    additional_notes?: string;
+    duration_minutes?: number | null;
+    additional_notes?: string | null;
   };
 }
 
@@ -36,10 +36,10 @@ export default function SessionCard({ session }: SessionCardProps) {
   return (
     <div
       onClick={() => setIsExpanded(!isExpanded)}
-      className="block bg-white border border-[#1A1A1A]/10 rounded-[2rem] p-8 hover:border-[#1A1A1A]/20 transition-all cursor-pointer shadow-sm overflow-hidden"
+      className="ink-card !bg-white/60 p-8 cursor-pointer group"
     >
       {/* 1. Reflection Text: The Hero */}
-      <h3 className={`text-xl font-serif text-[#1A1A1A] leading-relaxed transition-all duration-300 ${!isExpanded ? 'line-clamp-2' : ''}`}>
+      <h3 className={`text-xl font-serif text-sumi-ink leading-relaxed transition-all duration-300 ${!isExpanded ? 'line-clamp-2' : ''}`}>
         {session.main_reflection}
       </h3>
 
@@ -49,7 +49,7 @@ export default function SessionCard({ session }: SessionCardProps) {
       >
         <div className="overflow-hidden">
           {session.additional_notes && (
-            <div className="mt-6 pt-6 border-t border-[#1A1A1A]/5 text-sm text-[#1A1A1A]/60 font-sans leading-relaxed">
+            <div className="mt-6 pt-6 border-t border-sumi-ink/5 text-sm text-sumi-ink/60 font-sans leading-relaxed">
               {session.additional_notes}
             </div>
           )}
@@ -57,11 +57,11 @@ export default function SessionCard({ session }: SessionCardProps) {
       </div>
 
       {/* 2. Visual Break: Subtle hairline divider */}
-      <hr className="border-[#1A1A1A]/10 my-6" />
+      <hr className="border-sumi-ink/10 my-6" />
 
       {/* 3. Metadata Row: Book Title • Date • Duration */}
-      <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-[#1A1A1A]/40 tracking-widest uppercase">
-        <span className="text-[#1A1A1A]/60">{session.book_title}</span>
+      <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-sumi-ink/40 tracking-widest uppercase">
+        <span className="text-sumi-ink/60">{session.book_title || 'Untitled Source'}</span>
         <span>•</span>
         <span>{formatDate(session.created_at)}</span>
         {session.duration_minutes && (
@@ -74,4 +74,5 @@ export default function SessionCard({ session }: SessionCardProps) {
     </div>
   );
 }
+
 

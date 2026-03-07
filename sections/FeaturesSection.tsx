@@ -11,16 +11,17 @@ export function FeaturesSection() {
     ]
 
     return (
-        <section id="features" className="py-24 px-6 lg:px-10 bg-rice-paper border-y border-sumi-ink/5">
+        <section id="features" className="py-32 px-6 lg:px-10 bg-rice-paper border-y border-sumi-ink/5">
             <div className="max-w-7xl mx-auto">
                 <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                     {features.map((f, i) => (
-                        <div key={i} className="p-8 bg-white/40 rounded-3xl border border-sumi-ink/5 hover:bg-white transition-all">
-                            <f.icon className="text-deep-moss mb-4" size={24} />
+                        <div key={i} className="ink-card !p-8">
+                            <f.icon className="text-seal-rust mb-4" size={24} />
                             <h3 className="font-bold text-sumi-ink mb-2">{f.title}</h3>
                             <p className="text-sm text-sumi-ink/60 leading-relaxed">{f.desc}</p>
                         </div>
                     ))}
+
                 </div>
             </div>
         </section>

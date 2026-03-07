@@ -4,10 +4,10 @@ interface ReflectionCardProps {
     session: {
         id: string;
         created_at: string;
-        book_title: string;
+        book_title: string | null;
         main_reflection: string;
-        duration_minutes?: number;
-        additional_notes?: string;
+        duration_minutes?: number | null;
+        additional_notes?: string | null;
     };
 }
 
@@ -41,7 +41,7 @@ export default function ReflectionCard({ session }: ReflectionCardProps) {
 
             {/* 3. Metadata Row: Book Title • Date • Duration */}
             <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-[#1A1A1A]/40 tracking-widest uppercase">
-                <span className="font-semibold text-[#1A1A1A]/60">{session.book_title}</span>
+                <span className="font-semibold text-[#1A1A1A]/60">{session.book_title || 'Untitled Source'}</span>
                 <span>•</span>
                 <span>{formatDate(session.created_at)}</span>
                 {session.duration_minutes && (

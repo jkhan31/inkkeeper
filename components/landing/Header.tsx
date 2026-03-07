@@ -27,16 +27,20 @@ export function Header({ onNavigate }: HeaderProps) {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-[#FAF5F0]/80 backdrop-blur-md border-b border-[#1A1A1A]/5 py-4' : 'bg-transparent py-6'
+            className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-rice-paper/80 backdrop-blur-md border-b border-sumi-ink/5 py-4' : 'bg-transparent py-6'
                 }`}
         >
             <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
                 {/* Logo */}
-                <Link href="/" className="flex items-center gap-2.5 group">
-                    <div className="w-9 h-9 bg-[#1A1A1A] rounded-full flex items-center justify-center transition-transform group-hover:rotate-12">
-                        <BookOpen size={18} className="text-[#FAF5F0]" />
+                <Link href="/" className="flex items-center gap-3 group">
+                    <div className="w-10 h-10 transition-transform duration-500 group-hover:scale-105 group-hover:rotate-3">
+                        <img
+                            src="/logo.png"
+                            alt="InkKeeper Logo"
+                            className="w-full h-full object-contain"
+                        />
                     </div>
-                    <span className="text-xl font-serif font-bold tracking-tight text-[#1A1A1A]">InkKeeper</span>
+                    <span className="text-xl font-serif font-bold tracking-tight text-sumi-ink">InkKeeper</span>
                 </Link>
 
                 {/* Desktop Nav */}
@@ -45,14 +49,14 @@ export function Header({ onNavigate }: HeaderProps) {
                         <button
                             key={item.id}
                             onClick={() => onNavigate(item.id)}
-                            className="text-sm font-medium text-[#1A1A1A]/60 hover:text-[#1A1A1A] transition-colors"
+                            className="text-sm font-medium text-sumi-ink/60 hover:text-sumi-ink transition-colors"
                         >
                             {item.label}
                         </button>
                     ))}
                     <Link
                         href="/login"
-                        className="bg-[#6A7F70] text-white px-6 py-2.5 rounded-full text-sm font-bold hover:bg-[#5A6F60] transition-colors shadow-sm"
+                        className="bg-seal-rust text-rice-paper px-6 py-2.5 rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-sm"
                     >
                         Start a session
                     </Link>
@@ -60,7 +64,7 @@ export function Header({ onNavigate }: HeaderProps) {
 
                 {/* Mobile Toggle */}
                 <button
-                    className="md:hidden text-[#1A1A1A]"
+                    className="md:hidden text-sumi-ink"
                     onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 >
                     {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
@@ -69,7 +73,7 @@ export function Header({ onNavigate }: HeaderProps) {
 
             {/* Mobile Menu Overlay */}
             {isMobileMenuOpen && (
-                <div className="absolute top-full left-0 right-0 bg-[#FAF5F0] border-b border-[#1A1A1A]/5 p-6 flex flex-col gap-6 md:hidden shadow-xl animate-in slide-in-from-top duration-300">
+                <div className="absolute top-full left-0 right-0 bg-rice-paper border-b border-sumi-ink/5 p-6 flex flex-col gap-6 md:hidden shadow-xl animate-in slide-in-from-top duration-300">
                     {navItems.map((item) => (
                         <button
                             key={item.id}
@@ -77,14 +81,14 @@ export function Header({ onNavigate }: HeaderProps) {
                                 onNavigate(item.id)
                                 setIsMobileMenuOpen(false)
                             }}
-                            className="text-left text-lg font-serif font-bold text-[#1A1A1A]"
+                            className="text-left text-lg font-serif font-bold text-sumi-ink"
                         >
                             {item.label}
                         </button>
                     ))}
                     <Link
                         href="/login"
-                        className="bg-[#1A1A1A] text-white text-center py-4 rounded-full font-bold"
+                        className="bg-seal-rust text-rice-paper text-center py-4 rounded-full font-bold"
                     >
                         Start a session
                     </Link>
