@@ -1,27 +1,46 @@
 'use client'
 
-import { Timer, MessageSquare, Archive, BarChart3 } from 'lucide-react'
+import { Timer, MessageSquare } from 'lucide-react'
 
 export function FeaturesSection() {
-    const features = [
-        { title: 'Reading Session', icon: Timer, desc: 'Start a timer when you begin reading. Mark the moment. Be present.' },
-        { title: 'Quick Capture', icon: MessageSquare, desc: 'Capture a reflection anytime, without starting a session.' },
-        { title: 'Personal Archive', icon: Archive, desc: 'Every reflection is saved. Searchable. Yours.' },
-        { title: 'Rediscovery', icon: BarChart3, desc: 'Old reflections surface again. See what you were thinking months ago.' }
-    ]
-
     return (
-        <section id="features" className="py-32 px-6 lg:px-10 bg-rice-paper border-y border-sumi-ink/5">
+        <section id="features" className="py-20 px-6 lg:px-10 bg-rice-paper border-y border-sumi-ink/5">
             <div className="max-w-7xl mx-auto">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {features.map((f, i) => (
-                        <div key={i} className="ink-card !p-8">
-                            <f.icon className="text-seal-rust mb-4" size={24} />
-                            <h3 className="font-bold text-sumi-ink mb-2">{f.title}</h3>
-                            <p className="text-sm text-sumi-ink/60 leading-relaxed">{f.desc}</p>
-                        </div>
-                    ))}
+                <h2 className="text-4xl font-serif font-bold text-sumi-ink mb-6">Reflect after reading — your way.</h2>
+                <div className="text-lg text-sumi-ink/60 leading-relaxed max-w-2xl mb-12 space-y-3">
+                    <p>Readers don&apos;t always read the same way.</p>
+                    <p>Sometimes you sit down for a focused session. Sometimes an idea appears unexpectedly.</p>
+                    <p>InkKeeper supports both.</p>
+                </div>
 
+                <div className="grid md:grid-cols-2 gap-10">
+                    <div className="ink-card !p-8 space-y-4">
+                        <div className="w-10 h-10 bg-seal-rust rounded-xl flex items-center justify-center">
+                            <Timer className="text-rice-paper w-5 h-5" />
+                        </div>
+                        <h3 className="text-2xl font-serif font-bold text-sumi-ink">Reading Session</h3>
+                        <div className="text-sumi-ink/60 space-y-2">
+                            <p>Start a timer.</p>
+                            <p>Read without distraction.</p>
+                            <p>Capture the idea when you&apos;re done.</p>
+                        </div>
+                        <div className="rounded-3xl border bg-white/70 shadow-sm aspect-[9/16] flex items-center justify-center mt-8">
+                            <span className="text-sm text-neutral-500">Session Timer</span>
+                        </div>
+                    </div>
+
+                    <div className="ink-card !p-8 space-y-4">
+                        <div className="w-10 h-10 bg-seal-rust rounded-xl flex items-center justify-center">
+                            <MessageSquare className="text-rice-paper w-5 h-5" />
+                        </div>
+                        <h3 className="text-2xl font-serif font-bold text-sumi-ink">Quick Capture</h3>
+                        <div className="text-sumi-ink/60 space-y-2">
+                            <p>Capture a reflection instantly without starting a session.</p>
+                        </div>
+                        <div className="rounded-3xl border bg-white/70 shadow-sm aspect-[9/16] flex items-center justify-center mt-8">
+                            <span className="text-sm text-neutral-500">Quick Capture Screenshot</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

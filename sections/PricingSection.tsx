@@ -5,7 +5,7 @@ import { Check, Sparkles } from 'lucide-react'
 
 export function PricingSection() {
     return (
-        <section id="pricing" className="py-32 px-6 lg:px-10 bg-rice-paper border-t border-sumi-ink/5">
+        <section id="pricing" className="py-20 px-6 lg:px-10 bg-rice-paper border-t border-sumi-ink/5">
             <div className="max-w-3xl mx-auto text-center">
                 <h2 className="text-4xl font-serif font-bold mb-12 text-sumi-ink">Simple pricing.</h2>
                 <div className="ink-card !p-12 border-2 border-seal-rust/20 shadow-xl relative overflow-hidden">

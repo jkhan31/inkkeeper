@@ -19,7 +19,7 @@ export function Header({ onNavigate }: HeaderProps) {
     }, [])
 
     const navItems = [
-        { label: 'Philosophy', id: 'problem' },
+        { label: 'Philosophy', id: 'philosophy' },
         { label: 'Ritual', id: 'solution' },
         { label: 'Features', id: 'features' },
         { label: 'Pricing', id: 'pricing' },

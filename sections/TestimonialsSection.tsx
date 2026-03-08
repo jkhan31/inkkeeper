@@ -10,7 +10,7 @@ export function TestimonialsSection() {
     ]
 
     return (
-        <section id="testimonials" className="py-32 px-6 lg:px-10 bg-rice-paper">
+        <section id="testimonials" className="py-20 px-6 lg:px-10 bg-rice-paper">
             <div className="max-w-7xl mx-auto">
                 <h2 className="text-4xl font-serif font-bold text-center mb-16 text-sumi-ink">What stayed with them</h2>
                 <div className="grid md:grid-cols-3 gap-8">

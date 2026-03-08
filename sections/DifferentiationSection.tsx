@@ -1,36 +1,19 @@
 'use client'
 
-import { X, Check } from 'lucide-react'
-
 export function DifferentiationSection() {
-    const notItems = ["Streaks", "Gamification", "Productivity pressure", "Social feeds"]
-
     return (
-        <section className="py-32 px-6 lg:px-10 bg-rice-paper">
-            <div className="max-w-5xl mx-auto">
-                <h2 className="text-3xl font-serif font-bold text-center mb-16 text-sumi-ink">A different kind of reading tool.</h2>
-                <div className="grid md:grid-cols-2 gap-8">
-                    <div className="p-10 bg-white/40 backdrop-blur-sm rounded-[2rem] border border-sumi-ink/5">
-                        <div className="flex items-center gap-2 mb-6">
-                            <X size={18} className="text-sumi-ink/30" />
-                            <span className="text-xs font-bold text-sumi-ink/40 uppercase tracking-widest">InkKeeper is not</span>
-                        </div>
-                        <ul className="space-y-4">
-                            {notItems.map((item, i) => (
-                                <li key={i} className="text-sumi-ink/60 font-medium">{item}</li>
-                            ))}
-                        </ul>
-                    </div>
-                    <div className="p-10 bg-white/40 backdrop-blur-sm rounded-[2rem] border-2 border-seal-rust/10 shadow-sm">
-                        <div className="flex items-center gap-2 mb-6">
-                            <Check size={18} className="text-seal-rust" />
-                            <span className="text-xs font-bold text-seal-rust uppercase tracking-widest">InkKeeper is</span>
-                        </div>
-                        <p className="text-xl font-serif text-sumi-ink leading-relaxed italic">
-                            A quiet system for readers who want to remember what they read.
-                        </p>
-                    </div>
+        <section id="philosophy" className="py-20 px-6 lg:px-10 bg-rice-paper border-y border-sumi-ink/5">
+            <div className="max-w-3xl mx-auto text-center space-y-6">
+                <h2 className="text-4xl font-serif font-bold text-sumi-ink">Designed for thoughtful readers.</h2>
+                <p className="text-lg text-sumi-ink/60 leading-relaxed">InkKeeper is intentionally minimal.</p>
+                <div className="text-lg text-sumi-ink/60 space-y-2">
+                    <p>No streaks.</p>
+                    <p>No gamification.</p>
+                    <p>No productivity pressure.</p>
                 </div>
+                <p className="text-lg text-sumi-ink/60 leading-relaxed">
+                    Just a quiet place to capture the ideas that stayed with you.
+                </p>
             </div>
         </section>
     )

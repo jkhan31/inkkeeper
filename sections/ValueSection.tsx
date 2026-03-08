@@ -10,7 +10,7 @@ export function ValueSection() {
     ]
 
     return (
-        <section className="py-32 px-6 lg:px-10 bg-rice-paper">
+        <section className="py-20 px-6 lg:px-10 bg-rice-paper">
             <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row gap-16 items-center">
                 <div className="lg:w-1/2 space-y-4 w-full">
                     {sessions.map((s, i) => (
@@ -22,15 +22,19 @@ export function ValueSection() {
                             </div>
                         </div>
                     ))}
-
+                    <div className="rounded-3xl border bg-white/70 shadow-sm aspect-[9/16] flex items-center justify-center mt-8">
+                        <span className="text-sm text-neutral-500">Archive View</span>
+                    </div>
                 </div>
                 <div className="lg:w-1/2 space-y-6">
-                    <h2 className="text-4xl font-serif font-bold text-sumi-ink">Your Personal Archive.</h2>
-                    <p className="text-lg text-sumi-ink/60 leading-relaxed">
-                        Each reflection is saved.
-
-                        Over weeks and months, they form a quiet archive — a record of the ideas that shaped your thinking.
-                    </p>
+                    <h2 className="text-4xl font-serif font-bold text-sumi-ink">Your personal archive of ideas.</h2>
+                    <div className="text-lg text-sumi-ink/60 leading-relaxed space-y-4">
+                        <p>Each reflection becomes part of a growing archive.</p>
+                        <p>Not highlights.</p>
+                        <p>Not notes.</p>
+                        <p>Ideas written in your own words.</p>
+                        <p>Over time your archive becomes a record of the ideas that shaped your thinking.</p>
+                    </div>
                 </div>
             </div>
         </section>
