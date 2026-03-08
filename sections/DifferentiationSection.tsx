@@ -3,12 +3,12 @@
 import { X, Check } from 'lucide-react'
 
 export function DifferentiationSection() {
-    const notItems = ["Gamified streaks", "Public feeds", "AI recommendations", "Clickbait distractions"]
+    const notItems = ["Streaks", "Gamification", "Productivity pressure", "Social feeds"]
 
     return (
         <section className="py-32 px-6 lg:px-10 bg-rice-paper">
             <div className="max-w-5xl mx-auto">
-                <h2 className="text-3xl font-serif font-bold text-center mb-16 text-sumi-ink">InkKeeper is a different kind of tool.</h2>
+                <h2 className="text-3xl font-serif font-bold text-center mb-16 text-sumi-ink">A different kind of reading tool.</h2>
                 <div className="grid md:grid-cols-2 gap-8">
                     <div className="p-10 bg-white/40 backdrop-blur-sm rounded-[2rem] border border-sumi-ink/5">
                         <div className="flex items-center gap-2 mb-6">
@@ -27,7 +27,7 @@ export function DifferentiationSection() {
                             <span className="text-xs font-bold text-seal-rust uppercase tracking-widest">InkKeeper is</span>
                         </div>
                         <p className="text-xl font-serif text-sumi-ink leading-relaxed italic">
-                            A professional tool for intentional readers who care more about mastery than speed.
+                            A quiet system for readers who want to remember what they read.
                         </p>
                     </div>
                 </div>

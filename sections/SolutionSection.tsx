@@ -23,9 +23,13 @@ export function SolutionSection() {
                     <div className="w-12 h-12 bg-seal-rust rounded-2xl flex items-center justify-center mb-6">
                         <PenLine className="text-rice-paper w-6 h-6" />
                     </div>
-                    <h2 className="text-4xl font-serif font-bold text-sumi-ink">The Act of Articulation.</h2>
+                    <h2 className="text-4xl font-serif font-bold text-sumi-ink">One question. After every read.</h2>
                     <p className="text-lg text-sumi-ink/60 leading-relaxed">
-                        By spending just two minutes typing your reflection after a session, you create the cognitive residue required for long-term memory.
+                        InkKeeper asks: what stood out most?
+
+                        Writing the idea in your own words is how you make it yours.
+
+                        It takes two minutes. It makes all the difference.
                     </p>
                 </div>
             </div>

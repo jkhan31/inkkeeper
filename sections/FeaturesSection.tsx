@@ -4,10 +4,10 @@ import { Timer, MessageSquare, Archive, BarChart3 } from 'lucide-react'
 
 export function FeaturesSection() {
     const features = [
-        { title: 'Timed Presence', icon: Timer, desc: 'A calm, count-up timer that honors your reading time.' },
-        { title: 'Intentional Prompts', icon: MessageSquare, desc: 'Capture the cognitive residue of every session.' },
-        { title: 'Private Archive', icon: Archive, desc: 'A searchable, secure home for your intellectual journey.' },
-        { title: 'Mastery Metrics', icon: BarChart3, desc: 'Visualize your retention and reading habits over time.' }
+        { title: 'Reading Session', icon: Timer, desc: 'Start a timer when you begin reading. Mark the moment. Be present.' },
+        { title: 'Quick Capture', icon: MessageSquare, desc: 'Capture a reflection anytime, without starting a session.' },
+        { title: 'Personal Archive', icon: Archive, desc: 'Every reflection is saved. Searchable. Yours.' },
+        { title: 'Rediscovery', icon: BarChart3, desc: 'Old reflections surface again. See what you were thinking months ago.' }
     ]
 
     return (

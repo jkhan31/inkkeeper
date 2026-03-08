@@ -25,9 +25,11 @@ export function ValueSection() {
 
                 </div>
                 <div className="lg:w-1/2 space-y-6">
-                    <h2 className="text-4xl font-serif font-bold text-sumi-ink">Build Your Quiet Archive.</h2>
+                    <h2 className="text-4xl font-serif font-bold text-sumi-ink">Your Personal Archive.</h2>
                     <p className="text-lg text-sumi-ink/60 leading-relaxed">
-                        Over weeks and months, your reflections coalesce into a private library of your own growth. A permanent record of what you’ve learned.
+                        Each reflection is saved.
+
+                        Over weeks and months, they form a quiet archive — a record of the ideas that shaped your thinking.
                     </p>
                 </div>
             </div>

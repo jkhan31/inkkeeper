@@ -15,7 +15,7 @@ export function HeroSection({ onNavigate }: HeroSectionProps) {
                         Read. <br /> Reflect. <br /> <span className="text-seal-rust">Remember.</span>
                     </h1>
                     <p className="text-lg lg:text-xl text-sumi-ink/70 leading-relaxed max-w-xl">
-                        InkKeeper is a quiet sanctuary for your thoughts. Time your focus, capture what lingers, and build a permanent archive of personal growth.
+                        Reading is easy. Remembering what you read is not. InkKeeper helps you capture the one idea that stayed with you — and keep it.
                     </p>
                 </div>
 
