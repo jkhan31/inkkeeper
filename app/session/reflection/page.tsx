@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { supabase } from '../../../lib/supabaseClient'
 
@@ -33,6 +33,25 @@ export default function Log() {
     const [additionalNotes, setAdditionalNotes] = useState('')
     const [validationError, setValidationError] = useState('')
     const [isSaving, setIsSaving] = useState(false)
+    const [showNotes, setShowNotes] = useState(false)
+
+    const reflectionTextareaRef = useRef<HTMLTextAreaElement>(null)
+    const notesTextareaRef = useRef<HTMLTextAreaElement>(null)
+
+    // Auto-resize textareas as content grows
+    useEffect(() => {
+        if (reflectionTextareaRef.current) {
+            reflectionTextareaRef.current.style.height = 'auto'
+            reflectionTextareaRef.current.style.height = `${reflectionTextareaRef.current.scrollHeight}px`
+        }
+    }, [mainReflection])
+
+    useEffect(() => {
+        if (notesTextareaRef.current) {
+            notesTextareaRef.current.style.height = 'auto'
+            notesTextareaRef.current.style.height = `${notesTextareaRef.current.scrollHeight}px`
+        }
+    }, [additionalNotes])
 
     // ═══════════════════════════════════════════════════════════
     // Load session from sessionStorage
@@ -132,8 +151,8 @@ export default function Log() {
     }
 
     return (
-        <main className="flex min-h-screen flex-col items-center bg-rice-paper text-sumi-ink pt-10 pb-16 px-6">
-            <div className="w-full max-w-md flex flex-col gap-10">
+        <main className="flex min-h-screen flex-col items-center bg-rice-paper text-sumi-ink pt-6 pb-12 px-6">
+            <div className="w-full max-w-[640px] flex flex-col gap-6">
                 {/* Back button */}
                 <div>
                     <button
@@ -148,80 +167,89 @@ export default function Log() {
                 </div>
 
                 {/* Prompt Heading */}
-                <h1 className="text-3xl font-serif tracking-tight text-center mt-2">
+                <h1 className="text-4xl font-serif tracking-tight text-center mt-2">
                     What stood out most?
                 </h1>
 
-                <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col gap-10">
+                <form onSubmit={(e) => { e.preventDefault(); handleSave(); }} className="flex flex-col gap-5">
                     <div className="flex flex-col gap-3">
-                        {/* 1. Reflection Text: The Focal Point */}
-                        <div className="ink-card !p-8">
-                            <label htmlFor="mainReflection" className="sr-only">Main Reflection</label>
-                            <textarea
-                                id="mainReflection"
-                                autoFocus
-                                value={mainReflection}
-                                onChange={(e) => setMainReflection(e.target.value)}
-                                placeholder="Write here..."
-                                rows={6}
-                                className="w-full bg-transparent resize-none text-2xl font-serif text-sumi-ink placeholder:text-sumi-ink/10 focus:outline-none leading-relaxed"
-                            />
-                        </div>
-                        {/* 1.1 Helper Text */}
-                        <p className="text-center text-xs font-sans text-sumi-ink/30 uppercase tracking-widest">
+                        {/* 1. Reflection Text: Open writing space */}
+                        <label htmlFor="mainReflection" className="sr-only">Main Reflection</label>
+                        <textarea
+                            ref={reflectionTextareaRef}
+                            id="mainReflection"
+                            autoFocus
+                            value={mainReflection}
+                            onChange={(e) => setMainReflection(e.target.value)}
+                            placeholder="Write the idea that stayed with you…"
+                            rows={4}
+                            className="w-full bg-white/40 border border-sumi-ink/10 rounded-lg px-5 py-4 resize-none overflow-hidden text-2xl font-serif text-sumi-ink placeholder:text-sumi-ink/20 focus:outline-none leading-relaxed"
+                        />
+
+                        {/* Helper Text */}
+                        <p className="text-sm font-sans text-sumi-ink/40">
                             One sentence is enough.
                         </p>
-                    </div>
 
-                    {/* Optional Fields Container */}
-                    <div className="ink-card !p-8 flex flex-col">
-                        {/* 2. Context / Notes */}
-                        <div className="mb-0">
-                            <label htmlFor="additionalNotes" className="text-[10px] font-sans text-sumi-ink/30 uppercase tracking-widest mb-4 block">
-                                Context / Notes
-                            </label>
-                            <textarea
-                                id="additionalNotes"
-                                value={additionalNotes}
-                                onChange={(e) => setAdditionalNotes(e.target.value)}
-                                placeholder="Any additional context? (optional)"
-                                rows={3}
-                                className="w-full bg-transparent resize-none text-sm font-sans text-sumi-ink/60 placeholder:text-sumi-ink/10 focus:outline-none leading-relaxed"
-                            />
-                        </div>
+                        {/* Optional Notes Toggle */}
+                        {!showNotes && (
+                            <button
+                                type="button"
+                                onClick={() => setShowNotes(true)}
+                                className="text-sm font-sans text-sumi-ink/40 hover:text-sumi-ink/60 transition-colors text-left"
+                            >
+                                + Add notes (optional)
+                            </button>
+                        )}
 
-                        {/* Visual Break */}
-                        <hr className="border-sumi-ink/10 my-8" />
-
-                        {/* 3. Book Title & Meta */}
-                        <div className="flex items-center flex-wrap gap-2 text-[10px] font-sans text-sumi-ink/40 tracking-widest uppercase">
-                            <div className="flex-1 min-w-[120px]">
-                                <label htmlFor="bookTitle" className="sr-only">Book Title</label>
-                                <input
-                                    id="bookTitle"
-                                    type="text"
-                                    value={bookTitle}
-                                    onChange={(e) => setBookTitle(e.target.value)}
-                                    placeholder="Book Title (Optional)"
-                                    className="w-full bg-transparent text-sumi-ink/60 placeholder:text-sumi-ink/20 focus:outline-none border-none p-0 h-auto uppercase tracking-widest"
+                        {/* Optional Notes Field */}
+                        {showNotes && (
+                            <div className="flex flex-col gap-2">
+                                <label htmlFor="additionalNotes" className="text-sm font-sans text-sumi-ink/40">
+                                    Additional notes
+                                </label>
+                                <textarea
+                                    ref={notesTextareaRef}
+                                    id="additionalNotes"
+                                    value={additionalNotes}
+                                    onChange={(e) => setAdditionalNotes(e.target.value)}
+                                    placeholder="Any additional context?"
+                                    rows={3}
+                                    className="w-full bg-white/40 border border-sumi-ink/10 rounded-lg px-5 py-4 resize-none overflow-hidden text-sm font-sans text-sumi-ink/60 placeholder:text-sumi-ink/20 focus:outline-none leading-relaxed"
                                 />
                             </div>
-                            <span>•</span>
-                            <span>{new Date(sessionData.startTime).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
-                            <span>•</span>
-                            <span>{sessionData.durationMinutes}m</span>
-                        </div>
+                        )}
                     </div>
 
+                    {/* Book Title */}
+                    <div className="flex flex-col gap-2">
+                        <label htmlFor="bookTitle" className="text-sm font-sans text-sumi-ink/40">
+                            Book Title
+                        </label>
+                        <input
+                            id="bookTitle"
+                            type="text"
+                            value={bookTitle}
+                            onChange={(e) => setBookTitle(e.target.value)}
+                            placeholder="Title of the book"
+                            className="w-full bg-white/40 border border-sumi-ink/10 rounded-lg px-5 py-3 text-sm font-sans text-sumi-ink placeholder:text-sumi-ink/30 focus:outline-none"
+                        />
+                    </div>
+
+                    {/* Metadata */}
+                    <p className="text-sm font-sans text-sumi-ink/40">
+                        {formatDate(sessionData.startTime)} · {formatDuration(sessionData.durationMinutes)}
+                    </p>
+
                     {validationError && (
-                        <p className="text-sm text-seal-rust text-center -mt-4">{validationError}</p>
+                        <p className="text-sm text-seal-rust text-center">{validationError}</p>
                     )}
 
                     {/* Primary Action */}
                     <button
                         type="submit"
                         disabled={isSaving}
-                        className="btn-primary w-full !py-5 text-lg font-serif disabled:opacity-50"
+                        className="btn-primary w-full !py-4 text-lg font-serif disabled:opacity-50"
                     >
                         {isSaving ? 'Preserving...' : 'Save to Archive'}
                     </button>
