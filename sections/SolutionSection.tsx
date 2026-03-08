@@ -8,10 +8,10 @@ export function SolutionSection() {
                     Capture the idea that stood out.
                 </h2>
                 <div className="space-y-5 text-lg text-sumi-ink/70 leading-relaxed mb-12">
-                    <p>After reading, InkKeeper asks one simple question:</p>
+                    <p>After reading, InkKeeper asks one simple question.</p>
                     <p className="text-2xl font-serif italic text-sumi-ink">What stood out most?</p>
                     <p>You write the idea in your own words.</p>
-                    <p>That reflection becomes part of your personal archive of ideas.</p>
+                    <p>One sentence is enough.</p>
                 </div>
 
                 {/* Reflection placeholder */}

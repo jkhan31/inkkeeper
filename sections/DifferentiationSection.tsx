@@ -30,11 +30,10 @@ export function DifferentiationSection() {
                 </h2>
                 <div className="space-y-4 text-lg text-sumi-ink/70 leading-relaxed mb-12">
                     <p>Each reflection becomes part of a growing archive.</p>
-                    <p>
-                        Not highlights.<br />
-                        Not notes.
-                    </p>
+                    <p>Not highlights.</p>
+                    <p>Not notes.</p>
                     <p>Ideas — written in your own words.</p>
+                    <p>Over time your archive becomes a record of the ideas that shaped your thinking.</p>
                 </div>
 
                 {/* Archive placeholder */}

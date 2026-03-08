@@ -9,11 +9,9 @@ export function TestimonialsSection() {
                 </h2>
                 <div className="space-y-4 text-lg text-sumi-ink/70 leading-relaxed">
                     <p>InkKeeper is intentionally minimal.</p>
-                    <p>
-                        No streaks.<br />
-                        No gamification.<br />
-                        No productivity pressure.
-                    </p>
+                    <p>No streaks.</p>
+                    <p>No gamification.</p>
+                    <p>No productivity pressure.</p>
                     <p>Just a quiet place to capture the ideas that stayed with you.</p>
                 </div>
             </div>

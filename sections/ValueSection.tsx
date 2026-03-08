@@ -8,11 +8,8 @@ export function ValueSection() {
                     Reflect after reading — your way.
                 </h2>
                 <div className="space-y-4 text-lg text-sumi-ink/70 leading-relaxed mb-12">
-                    <p>Readers don&apos;t all read the same way.</p>
-                    <p>
-                        Sometimes you sit down for a focused reading session.<br />
-                        Sometimes an idea appears unexpectedly.
-                    </p>
+                    <p>Sometimes you sit down for a focused reading session.</p>
+                    <p>Sometimes an idea appears unexpectedly.</p>
                     <p>InkKeeper supports both.</p>
                 </div>
 
@@ -21,7 +18,7 @@ export function ValueSection() {
                     <div className="rounded-3xl bg-white/60 border border-sumi-ink/10 shadow-sm p-6 font-sans">
                         <p className="text-xs font-bold uppercase tracking-widest text-sumi-ink/40 mb-4">Reading Session</p>
                         <ul className="space-y-2 text-sm text-sumi-ink/70 mb-6">
-                            <li>Start a reading session</li>
+                            <li>Start a timer</li>
                             <li>Read without distraction</li>
                             <li>Capture the idea when you&apos;re done</li>
                         </ul>
@@ -40,7 +37,7 @@ export function ValueSection() {
                     <div className="rounded-3xl bg-white/60 border border-sumi-ink/10 shadow-sm p-6 font-sans">
                         <p className="text-xs font-bold uppercase tracking-widest text-sumi-ink/40 mb-4">Quick Capture</p>
                         <ul className="space-y-2 text-sm text-sumi-ink/70 mb-6">
-                            <li>Capture an idea immediately without starting a session.</li>
+                            <li>Capture a reflection instantly without starting a session.</li>
                         </ul>
                         {/* Quick reflection input placeholder */}
                         <div className="rounded-2xl bg-rice-paper border border-sumi-ink/5 p-4">

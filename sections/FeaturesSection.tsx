@@ -10,10 +10,8 @@ export function FeaturesSection() {
                 <div className="space-y-4 text-lg text-sumi-ink/70 leading-relaxed mb-12">
                     <p>InkKeeper occasionally surfaces reflections from your archive.</p>
                     <p>A thought you captured months ago might appear again.</p>
-                    <p>
-                        Not as a task.<br />
-                        Just as a quiet moment of rediscovery.
-                    </p>
+                    <p>Not as a task.</p>
+                    <p>Just as a quiet moment of rediscovery.</p>
                 </div>
 
                 {/* Rediscovery card */}

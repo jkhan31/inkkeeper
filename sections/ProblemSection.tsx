@@ -14,13 +14,9 @@ export function ProblemSection() {
                         Not because the ideas weren&apos;t valuable —<br />
                         but because they were never articulated.
                     </p>
-                    <p>Most reading tools track progress:</p>
-                    <ul className="pl-6 space-y-1 text-sumi-ink/60">
-                        <li>• books finished</li>
-                        <li>• pages read</li>
-                        <li>• highlights saved</li>
-                    </ul>
-                    <p>But they rarely capture what actually stayed with you.</p>
+                    <p>We highlight passages.</p>
+                    <p>But we rarely ask:</p>
+                    <p className="font-serif italic text-sumi-ink">What idea actually stayed with me?</p>
                 </div>
             </div>
         </section>
