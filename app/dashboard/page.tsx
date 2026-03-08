@@ -19,11 +19,12 @@ import { useAuthGuard } from '../../lib/hooks/useAuthGuard'
 interface Session {
     id: string
     created_at: string
-    duration_minutes: number | null
+    start_time: string | null
     end_time: string | null
+    duration_minutes: number | null
     book_title: string | null
     main_reflection: string
-    additional_notes?: string
+    additional_notes?: string | null
 }
 
 
@@ -36,7 +37,7 @@ export default function Dashboard() {
     const fetchRecentSessions = useCallback(async () => {
         const { data, error } = await supabase
             .from('sessions')
-            .select('id, created_at, duration_minutes, book_title, main_reflection, additional_notes')
+            .select('id, created_at, start_time, end_time, duration_minutes, book_title, main_reflection, additional_notes')
             .order('created_at', { ascending: false })
             .limit(3)
 
@@ -47,7 +48,7 @@ export default function Dashboard() {
         }
 
         if (data) {
-            setRecentSessions(data)
+            setRecentSessions(data as Session[])
         }
     }, [])
 
