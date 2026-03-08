@@ -4,14 +4,17 @@ import Link from 'next/link'
 
 export function ClosingCTASection() {
     return (
-        <section className="py-40 px-6 bg-rice-paper text-center border-t border-sumi-ink/5">
-            <div className="max-w-2xl mx-auto">
-                <h2 className="text-4xl font-serif font-bold text-sumi-ink mb-6">Keep what matters.</h2>
-                <p className="text-lg text-sumi-ink/60 mb-10 leading-relaxed font-sans">
-                    The ideas you encounter today don&apos;t have to vanish by tomorrow.
-                </p>
-                <Link href="/login" className="inline-block bg-seal-rust text-rice-paper px-10 py-4 rounded-full font-bold hover:opacity-90 transition-all">
-                    Start a session
+        <section className="py-24 bg-rice-paper border-t border-sumi-ink/5">
+            <div className="max-w-3xl mx-auto px-6">
+                <h2 className="text-3xl lg:text-4xl font-serif font-bold text-sumi-ink leading-tight mb-6">
+                    Start building your personal archive.
+                </h2>
+                <div className="space-y-4 text-lg text-sumi-ink/70 leading-relaxed mb-10">
+                    <p>InkKeeper is currently in early access.</p>
+                    <p>Join the first readers building a personal archive of ideas from their reading.</p>
+                </div>
+                <Link href="/login" className="btn-primary">
+                    Join Early Access
                 </Link>
             </div>
         </section>

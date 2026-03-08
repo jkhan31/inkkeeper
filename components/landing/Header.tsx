@@ -19,10 +19,10 @@ export function Header({ onNavigate }: HeaderProps) {
     }, [])
 
     const navItems = [
-        { label: 'Philosophy', id: 'problem' },
-        { label: 'Ritual', id: 'solution' },
-        { label: 'Features', id: 'features' },
-        { label: 'Pricing', id: 'pricing' },
+        { label: 'The Ritual', id: 'solution' },
+        { label: 'Capture', id: 'capture' },
+        { label: 'Archive', id: 'archive' },
+        { label: 'Philosophy', id: 'philosophy' },
     ]
 
     return (
@@ -58,7 +58,7 @@ export function Header({ onNavigate }: HeaderProps) {
                         href="/login"
                         className="bg-seal-rust text-rice-paper px-6 py-2.5 rounded-full text-sm font-bold hover:opacity-90 transition-all shadow-sm"
                     >
-                        Start a session
+                        Join Early Access
                     </Link>
                 </nav>
 
@@ -90,7 +90,7 @@ export function Header({ onNavigate }: HeaderProps) {
                         href="/login"
                         className="bg-seal-rust text-rice-paper text-center py-4 rounded-full font-bold"
                     >
-                        Start a session
+                        Join Early Access
                     </Link>
                 </div>
             )}

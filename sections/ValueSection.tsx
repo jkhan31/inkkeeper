@@ -1,34 +1,54 @@
 'use client'
 
-import { BookOpen } from 'lucide-react'
-
 export function ValueSection() {
-    const sessions = [
-        { title: 'Stillness is Key', date: 'Jan 12' },
-        { title: 'The Antidote to Chaos', date: 'Jan 10' },
-        { title: 'Systems over Goals', date: 'Jan 08' }
-    ]
-
     return (
-        <section className="py-32 px-6 lg:px-10 bg-rice-paper">
-            <div className="max-w-7xl mx-auto flex flex-col-reverse lg:flex-row gap-16 items-center">
-                <div className="lg:w-1/2 space-y-4 w-full">
-                    {sessions.map((s, i) => (
-                        <div key={i} className="ink-card !p-4 flex items-center gap-4">
-                            <BookOpen size={18} className="text-seal-rust" />
-                            <div className="flex-1">
-                                <p className="font-bold text-sumi-ink">{s.title}</p>
-                                <p className="text-[10px] font-bold uppercase tracking-widest text-sumi-ink/40">{s.date}</p>
+        <section id="capture" className="py-24 bg-rice-paper border-t border-sumi-ink/5">
+            <div className="max-w-3xl mx-auto px-6">
+                <h2 className="text-3xl lg:text-4xl font-serif font-bold text-sumi-ink leading-tight mb-6">
+                    Reflect after reading — your way.
+                </h2>
+                <div className="space-y-4 text-lg text-sumi-ink/70 leading-relaxed mb-12">
+                    <p>Readers don&apos;t all read the same way.</p>
+                    <p>
+                        Sometimes you sit down for a focused reading session.<br />
+                        Sometimes an idea appears unexpectedly.
+                    </p>
+                    <p>InkKeeper supports both.</p>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-6">
+                    {/* Reading Session */}
+                    <div className="rounded-3xl bg-white/60 border border-sumi-ink/10 shadow-sm p-6 font-sans">
+                        <p className="text-xs font-bold uppercase tracking-widest text-sumi-ink/40 mb-4">Reading Session</p>
+                        <ul className="space-y-2 text-sm text-sumi-ink/70 mb-6">
+                            <li>Start a reading session</li>
+                            <li>Read without distraction</li>
+                            <li>Capture the idea when you&apos;re done</li>
+                        </ul>
+                        {/* Timer placeholder */}
+                        <div className="rounded-2xl bg-rice-paper border border-sumi-ink/5 p-4 text-center">
+                            <p className="text-xs font-bold uppercase tracking-widest text-sumi-ink/40 mb-1">Reading Session</p>
+                            <p className="text-3xl font-serif text-sumi-ink mb-4">00:24:18</p>
+                            <div className="flex gap-2 justify-center">
+                                <button className="px-4 py-1.5 rounded-full border border-sumi-ink/10 text-xs font-bold text-sumi-ink/60">Pause</button>
+                                <button className="px-4 py-1.5 rounded-full bg-seal-rust text-rice-paper text-xs font-bold">End Session</button>
                             </div>
                         </div>
-                    ))}
+                    </div>
 
-                </div>
-                <div className="lg:w-1/2 space-y-6">
-                    <h2 className="text-4xl font-serif font-bold text-sumi-ink">Build Your Quiet Archive.</h2>
-                    <p className="text-lg text-sumi-ink/60 leading-relaxed">
-                        Over weeks and months, your reflections coalesce into a private library of your own growth. A permanent record of what you’ve learned.
-                    </p>
+                    {/* Quick Capture */}
+                    <div className="rounded-3xl bg-white/60 border border-sumi-ink/10 shadow-sm p-6 font-sans">
+                        <p className="text-xs font-bold uppercase tracking-widest text-sumi-ink/40 mb-4">Quick Capture</p>
+                        <ul className="space-y-2 text-sm text-sumi-ink/70 mb-6">
+                            <li>Capture an idea immediately without starting a session.</li>
+                        </ul>
+                        {/* Quick reflection input placeholder */}
+                        <div className="rounded-2xl bg-rice-paper border border-sumi-ink/5 p-4">
+                            <p className="text-xs font-bold uppercase tracking-widest text-seal-rust mb-2">What stood out most?</p>
+                            <div className="h-14 rounded-xl bg-sumi-ink/5 mb-3" />
+                            <div className="h-8 rounded-xl bg-sumi-ink/5 w-1/2" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>

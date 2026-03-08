@@ -1,27 +1,28 @@
 'use client'
 
-import { Timer, MessageSquare, Archive, BarChart3 } from 'lucide-react'
-
 export function FeaturesSection() {
-    const features = [
-        { title: 'Timed Presence', icon: Timer, desc: 'A calm, count-up timer that honors your reading time.' },
-        { title: 'Intentional Prompts', icon: MessageSquare, desc: 'Capture the cognitive residue of every session.' },
-        { title: 'Private Archive', icon: Archive, desc: 'A searchable, secure home for your intellectual journey.' },
-        { title: 'Mastery Metrics', icon: BarChart3, desc: 'Visualize your retention and reading habits over time.' }
-    ]
-
     return (
-        <section id="features" className="py-32 px-6 lg:px-10 bg-rice-paper border-y border-sumi-ink/5">
-            <div className="max-w-7xl mx-auto">
-                <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {features.map((f, i) => (
-                        <div key={i} className="ink-card !p-8">
-                            <f.icon className="text-seal-rust mb-4" size={24} />
-                            <h3 className="font-bold text-sumi-ink mb-2">{f.title}</h3>
-                            <p className="text-sm text-sumi-ink/60 leading-relaxed">{f.desc}</p>
-                        </div>
-                    ))}
+        <section id="rediscovery" className="py-24 bg-rice-paper border-t border-sumi-ink/5">
+            <div className="max-w-3xl mx-auto px-6">
+                <h2 className="text-3xl lg:text-4xl font-serif font-bold text-sumi-ink leading-tight mb-6">
+                    Rediscover ideas months later.
+                </h2>
+                <div className="space-y-4 text-lg text-sumi-ink/70 leading-relaxed mb-12">
+                    <p>InkKeeper occasionally surfaces reflections from your archive.</p>
+                    <p>A thought you captured months ago might appear again.</p>
+                    <p>
+                        Not as a task.<br />
+                        Just as a quiet moment of rediscovery.
+                    </p>
+                </div>
 
+                {/* Rediscovery card */}
+                <div className="rounded-3xl bg-white/60 border border-sumi-ink/10 shadow-sm p-6 font-sans">
+                    <p className="text-xs font-bold uppercase tracking-widest text-seal-rust mb-4">From Your Archive</p>
+                    <p className="font-serif text-sumi-ink text-xl italic leading-relaxed mb-4">
+                        &ldquo;You fall to the level of your systems.&rdquo;
+                    </p>
+                    <p className="text-[11px] text-sumi-ink/40">Atomic Habits · 2 months ago</p>
                 </div>
             </div>
         </section>
