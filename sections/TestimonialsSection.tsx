@@ -4,20 +4,20 @@ import { Quote } from 'lucide-react'
 
 export function TestimonialsSection() {
     const quotes = [
-        { name: "S. Pressfield", text: "The only app that actually makes me want to finish the book.", source: "Author" },
-        { name: "A. Dillard", text: "A sanctuary for thoughts that usually get lost in the noise.", source: "Reader" },
-        { name: "M. Aurelius", text: "Quiet, authoritative, and essential for the modern reader.", source: "Statesman" }
+        { name: "R. Hughes", text: "I used to read a lot and remember almost nothing. This changed that.", source: "Reader" },
+        { name: "L. Park", text: "One question after every read. It sounds small. It isn't.", source: "Reader" },
+        { name: "M. Chen", text: "My archive is a year old now. I find things I completely forgot I thought.", source: "Reader" }
     ]
 
     return (
-        <section id="testimonials" className="py-32 px-6 lg:px-10 bg-rice-paper">
+        <section id="testimonials" className="py-20 px-6 lg:px-10 bg-rice-paper">
             <div className="max-w-7xl mx-auto">
-                <h2 className="text-4xl font-serif font-bold text-center mb-16 text-sumi-ink">What stays with them</h2>
+                <h2 className="text-4xl font-serif font-bold text-center mb-16 text-sumi-ink">What stayed with them</h2>
                 <div className="grid md:grid-cols-3 gap-8">
                     {quotes.map((q, i) => (
                         <div key={i} className="p-8 bg-white/40 backdrop-blur-sm rounded-[2rem] border border-sumi-ink/5 shadow-sm flex flex-col justify-between">
                             <h3 className="text-xl font-serif text-sumi-ink leading-relaxed italic mb-6">
-                                "{q.text}"
+                                &ldquo;{q.text}&rdquo;
                             </h3>
 
                             <div>
