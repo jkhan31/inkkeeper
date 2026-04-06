@@ -10,14 +10,13 @@ import { ValueSection } from '../sections/ValueSection'
 import { DifferentiationSection } from '../sections/DifferentiationSection'
 import { FeaturesSection } from '../sections/FeaturesSection'
 import { TestimonialsSection } from '../sections/TestimonialsSection'
-import { PricingSection } from '../sections/PricingSection'
 import { ClosingCTASection } from '../sections/ClosingCTASection'
 
 export default function LandingPage() {
   const scrollToSection = useCallback((id: string) => {
     const element = document.getElementById(id)
     if (element) {
-      const offset = 80 // Offset for the sticky header
+      const offset = 80
       const bodyRect = document.body.getBoundingClientRect().top
       const elementRect = element.getBoundingClientRect().top
       const elementPosition = elementRect - bodyRect
@@ -31,38 +30,35 @@ export default function LandingPage() {
   }, [])
 
   return (
-    <div className="relative min-h-screen selection:bg-seal-rust/10">
+    <div className="relative min-h-screen selection:bg-seal-rust/10 bg-rice-paper">
       {/* Visual Texture */}
       <div className="grain-overlay" />
 
       <Header onNavigate={scrollToSection} />
 
-      <main>
-        <HeroSection onNavigate={scrollToSection} />
+      <main className="pt-20">
+        {/* Section 1 — Hero */}
+        <HeroSection />
 
-        <div id="problem">
-          <ProblemSection />
-        </div>
+        {/* Section 2 — Problem */}
+        <ProblemSection />
 
-        <div id="solution">
-          <SolutionSection />
-        </div>
+        {/* Section 3 — The Ritual */}
+        <SolutionSection />
 
+        {/* Section 4 — Two Ways to Capture */}
         <ValueSection />
+
+        {/* Section 5 — Personal Archive */}
         <DifferentiationSection />
 
-        <div id="features">
-          <FeaturesSection />
-        </div>
+        {/* Section 6 — Rediscovery */}
+        <FeaturesSection />
 
-        <div id="testimonials">
-          <TestimonialsSection />
-        </div>
+        {/* Section 7 — Philosophy */}
+        <TestimonialsSection />
 
-        <div id="pricing">
-          <PricingSection />
-        </div>
-
+        {/* Section 8 — Final CTA */}
         <ClosingCTASection />
       </main>
 
